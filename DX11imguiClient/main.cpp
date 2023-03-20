@@ -78,6 +78,7 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
+    bool test_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
@@ -144,7 +145,6 @@ int main(int, char**)
 
 
 
-
             char* buf = new char();
             float f = 0.2;
         // 예시 윈도우 열어보기
@@ -197,6 +197,22 @@ int main(int, char**)
             ImGui::EndChild();
             ImGui::End();
         }
+
+
+
+
+        if (test_window)
+        {
+            ImGui::Begin("Client");
+
+            ImGui::Text("Hello, world %d", 123);
+
+            if (ImGui::Button("Close Me"))
+                test_window = false;
+
+            ImGui::End();
+        }
+
 
 
 
