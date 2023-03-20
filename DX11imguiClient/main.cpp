@@ -160,6 +160,25 @@ int main(int, char**)
             ImGui::End();
         }
 
+
+
+
+        if (test_window)
+        {
+            ImGui::Begin("Client");
+
+            ImGui::Text("Hello, world %d", 123);
+            ImGui::InputText("string", buf, IM_ARRAYSIZE(buf));
+            ImGui::LogText(buf);
+
+            if (ImGui::Button("Close Me"))
+                test_window = false;
+
+            ImGui::End();
+        }
+
+
+
 	        bool my_tool_active = true;
             float* my_color = new float[3];
             my_color[0] = 0.2;
@@ -199,19 +218,6 @@ int main(int, char**)
         }
 
 
-
-
-        if (test_window)
-        {
-            ImGui::Begin("Client");
-
-            ImGui::Text("Hello, world %d", 123);
-
-            if (ImGui::Button("Close Me"))
-                test_window = false;
-
-            ImGui::End();
-        }
 
 
 
