@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="WoodnetBase">
+      <UniqueIdentifier>{9bdbfdf0-0597-4543-8acb-35f9230b2afc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +42,27 @@
     <ClCompile Include="imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Simple_dx11.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientProgram.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WoodnetBase\StreamQueue.cpp">
+      <Filter>WoodnetBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WoodnetBase\TCPSocket.cpp">
+      <Filter>WoodnetBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WoodnetBase\UDPSocket.cpp">
+      <Filter>WoodnetBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WoodnetBase\WinNetwork.cpp">
+      <Filter>WoodnetBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WoodnetBase\WinSocket.cpp">
+      <Filter>WoodnetBase</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imconfig.h">
@@ -55,6 +79,36 @@
     </ClInclude>
     <ClInclude Include="imgui_internal.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Simple_dx11.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="convert_string.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientProgram.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\CommonDefines.h">
+      <Filter>WoodnetBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\StreamQueue.h">
+      <Filter>WoodnetBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\TCPSocket.h">
+      <Filter>WoodnetBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\UDPSocket.h">
+      <Filter>WoodnetBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\WinNetwork.h">
+      <Filter>WoodnetBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\WinSocket.h">
+      <Filter>WoodnetBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h">
+      <Filter>WoodnetBase</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
