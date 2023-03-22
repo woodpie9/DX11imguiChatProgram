@@ -2,12 +2,12 @@
 
 #include <string>
 #include <vector>
+#include <WS2tcpip.h>
 
+#include "../woodnetBase/CommonDefines.h"
 #include "../woodnetBase/WinNetwork.h"
 #include "../woodnetBase/TCPSocket.h"
 #include "../woodnetBase/WoodnetProtocol.h"
-#include "../woodnetBase/CommonDefines.h"
-//using namespace woodnet;
 
 // 연결 상태를 제어한다.
 enum class ConnectionStatus
@@ -118,8 +118,8 @@ private:
 	bool OnClient;
 	bool OnConnect;
 
+public:
 	std::vector<std::string> m_vector_msg;
 
 
 };
-

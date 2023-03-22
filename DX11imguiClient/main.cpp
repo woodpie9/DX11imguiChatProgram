@@ -2,7 +2,6 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
-#include <corecrt_math.h>
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -13,6 +12,8 @@
 #include <tchar.h>
 #include <vector>
 
+
+//
 
 // Data
 static ID3D11Device* g_pd3dDevice = NULL;
@@ -29,6 +30,12 @@ void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+
+// Client
+//woodnet::WinNetwork* network;
+//ClientProgram* client;
+
+
 // Main code
 int main(int, char**)
 {
@@ -36,7 +43,7 @@ int main(int, char**)
 	//ImGui_ImplWin32_EnableDpiAwareness();
 	WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"ImGui Example", NULL };
 	::RegisterClassExW(&wc);
-	HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, wc.hInstance, NULL);
+	HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Chat Client", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, wc.hInstance, NULL);
 
 	// Initialize Direct3D
 	if (!CreateDeviceD3D(hwnd))
@@ -65,17 +72,8 @@ int main(int, char**)
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
-	// Load Fonts
-	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-	// - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-	// - Read 'docs/FONTS.md' for more instructions and details.
-	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-
-	// 한글 폰트 추가
-	io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\malgun.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+	// Load Fonts 한글 폰트 추가
+	io.Fonts->AddFontFromFileTTF(R"(c:\Windows\Fonts\malgun.ttf)", 18.0f, NULL, io.Fonts->GetGlyphRangesKorean());
 
 	//io.Fonts->AddFontDefault();
 	//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
@@ -88,6 +86,12 @@ int main(int, char**)
 	bool show_chatting_client = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	//network = new woodnet::WinNetwork();
+	//client = new ClientProgram();
+
+	// winsock2 사용 시작
+	//network->Init();
+	//client->init();
 
 	bool isConnect = false;
 	bool isLogin = false;
@@ -266,12 +270,40 @@ int main(int, char**)
 				}
 
 
-
-
-
-
 			}
 			ImGui::End();
+
+
+			// log
+			//ImGui::Begin("logger");
+			//{
+			//	client->m_vector_msg;
+
+			//	const ImGuiWindowFlags child_flags = ImGuiWindowFlags_MenuBar;
+			//	ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
+			//	if (ImGui::BeginMenuBar())
+			//	{
+			//		ImGui::TextUnformatted(u8"체팅방 이름");
+			//		ImGui::EndMenuBar();
+			//	}
+
+			//	int track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
+
+			//	for (int item = 0; item < client->m_vector_msg.size(); item++)
+			//	{
+			//		if (item == track_item)
+			//		{
+			//			ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
+			//			ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
+			//		}
+			//		else
+			//		{
+			//			ImGui::Text(client->m_vector_msg[item].c_str());
+			//		}
+			//	}
+			//	ImGui::EndChild();
+			//}
+			//ImGui::End();
 		}
 
 
@@ -294,6 +326,9 @@ int main(int, char**)
 	CleanupDeviceD3D();
 	::DestroyWindow(hwnd);
 	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+
+	// winsock2 사용 종료
+	//network->CleanUp();
 
 	return 0;
 }
@@ -369,21 +404,21 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	switch (msg)
 	{
-	case WM_SIZE:
-		if (g_pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
-		{
-			CleanupRenderTarget();
-			g_pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-			CreateRenderTarget();
-		}
-		return 0;
-	case WM_SYSCOMMAND:
-		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+		case WM_SIZE:
+			if (g_pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
+			{
+				CleanupRenderTarget();
+				g_pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
+				CreateRenderTarget();
+			}
 			return 0;
-		break;
-	case WM_DESTROY:
-		::PostQuitMessage(0);
-		return 0;
+		case WM_SYSCOMMAND:
+			if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+				return 0;
+			break;
+		case WM_DESTROY:
+			::PostQuitMessage(0);
+			return 0;
 	}
 	return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }
