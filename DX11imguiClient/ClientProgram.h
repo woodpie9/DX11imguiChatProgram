@@ -9,11 +9,12 @@
 #include "../woodnetBase/CommonDefines.h"
 //using namespace woodnet;
 
-// 연결 상태를 제어합니다.
+// 연결 상태를 제어한다.
 enum class ConnectionStatus
 {
 	None,
 	Oppend,
+	SetEvent,
 	Connecting,
 	Connected,
 	OnChat,
@@ -27,7 +28,9 @@ enum class _Error : int
 	success = 0,
 	error,
 	not_init,
+	already_init,
 	not_connect,
+	already_connect,
 };
 
 class ClientProgram
@@ -36,41 +39,42 @@ public:
 	ClientProgram();
 	~ClientProgram() {};
 
-	ConnectionStatus get_m_connection_status() const
+	ConnectionStatus get_connection_status() const
 	{
 		return m_connection_status;
 	}
 
-	void set_m_connection_status(const ConnectionStatus m_connection_status)
+	void set_connection_status(const ConnectionStatus m_connection_status)
 	{
 		this->m_connection_status = m_connection_status;
 	}
 
-	_Error get_m_last_error() const
+	_Error get_last_error() const
 	{
 		return m_last_error_;
 	}
 
-	void set_m_last_error(const _Error m_last_error)
+	void set_last_error(const _Error m_last_error)
 	{
 		m_last_error_ = m_last_error;
 	}
 
 public:
 	// 소켓 통신 관련 제어 함수
-	bool init();
-	bool connect_server(std::string ConnectIP);
-	bool login_server();
+	bool init();									// 소켓을 준비한다. (Open)
+	bool connect_server(std::string ConnectIP);		// 서버에 연결한다. (Connect)
+	bool login_server();							// 로비 서버에 접속상태로 변경
 	bool set_nickname(std::string nickname);
 	bool change_name(std::string nickname);
 	bool network_update();
-	bool clean_up();
-	bool close();
+	//bool clean_up();
+	bool close();									// 소켓을 닫는다.
+	bool check_connect();
 
-	// 패킷을 만들고, 메시지를 전송함
+	// 패킷을 만들고, 메시지를 전송한다.
 	bool send_chat_msg(std::string msg);
 	// 메시지가 담겨있는 벡터를 초기화 하는 함수 (clear)
-	bool clear_msg_vector();
+	void clear_msg_vector() { m_vector_msg.clear(); }
 
 private:
 	// 
@@ -90,7 +94,7 @@ private:
 	bool on_packet_proc_accept(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
 	bool on_packet_proc_enter_lobby(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
 	bool on_packet_proc_enter_chat(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
-	bool on_packet_proc_s2c_new_player(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
+	bool on_packet_proc_new_player(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
 	bool on_packet_proc_leave_player(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
 	bool on_packet_proc_change_name(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
 	bool on_packet_proc_chat(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen);
