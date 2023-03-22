@@ -5,8 +5,8 @@
 
 // Client
 #include "../woodnetBase/WinNetwork.h"
-woodnet::WinNetwork* network;
 #include "ClientProgram.h"
+woodnet::WinNetwork* network;
 ClientProgram* client;
 
 
@@ -90,12 +90,12 @@ int main(int, char**)
 	bool show_chatting_client = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-	//network = new woodnet::WinNetwork();
-	//client = new ClientProgram();
+	network = new woodnet::WinNetwork();
+	client = new ClientProgram();
 
 	// winsock2 사용 시작
-	//network->Init();
-	//client->init();
+	network->Init();
+	client->init();
 
 	bool isConnect = false;
 	bool isLogin = false;
@@ -103,13 +103,15 @@ int main(int, char**)
 	static char nickname[128] = "";
 	bool checkbox1 = false;
 	static char password[128] = "";
-	std::vector<std::string> chat_message;
+	//std::vector<std::string> chat_message;
 	static char msgbox[128] = "";
 
 	// Main loop
 	bool done = false;
 	while (!done)
 	{
+
+
 		// Poll and handle messages (inputs, window resize, etc.)
 		// See the WndProc() function below for our to dispatch events to the Win32 backend.
 		MSG msg;
@@ -175,6 +177,11 @@ int main(int, char**)
 
 		if (show_chatting_client)
 		{
+			if (isConnect == true)
+			{
+				// cliend loop
+				client->network_update();
+			}
 			ImGui::SetNextWindowSize(ImVec2(520, 500), ImGuiCond_FirstUseEver);
 			ImGui::Begin("Chatting Client");
 			{
@@ -188,7 +195,8 @@ int main(int, char**)
 					if (ImGui::Button(u8"서버 접속"))
 					{
 						isConnect = true;
-						chat_message.push_back(const_cast<char*>(IPlist[IP_current]));
+						client->m_vector_msg.push_back(const_cast<char*>(IPlist[IP_current]));
+						client->connect_server(IPlist[IP_current]);
 					}
 				}
 				else if (isConnect && !isLogin && !isStartChat)
@@ -200,10 +208,12 @@ int main(int, char**)
 					ImGui::SameLine();
 					if (ImGui::Button(u8"체팅 시작"))
 					{
+						client->login_server();
 						isLogin = true;
 						isStartChat = true;
-						chat_message.push_back(nickname);
-						chat_message.push_back(password);
+						client->m_vector_msg.push_back(nickname);
+						client->m_vector_msg.push_back(password);
+						client->set_nickname(nickname);
 					}
 
 					if (checkbox1)
@@ -239,17 +249,17 @@ int main(int, char**)
 						ImGui::TextUnformatted(u8"체팅방 이름");
 						ImGui::EndMenuBar();
 					}
-					track_item = static_cast<int>(chat_message.size()) - 1;
-					for (int item = 0; item < chat_message.size(); item++)
+					track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
+					for (int item = 0; item < client->m_vector_msg.size(); item++)
 					{
 						if (enable_track && item == track_item)
 						{
-							ImGui::TextColored(ImVec4(1, 1, 0, 1), chat_message[item].c_str());
+							ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
 							ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
 						}
 						else
 						{
-							ImGui::Text(chat_message[item].c_str());
+							ImGui::Text(client->m_vector_msg[item].c_str());
 						}
 					}
 					ImGui::EndChild();
@@ -259,12 +269,12 @@ int main(int, char**)
 					ImGui::SameLine();
 					if (ImGui::Button(u8"전송"))
 					{
-						char* tmp22 = new char[128];
-						strcpy_s(tmp22, 128, msgbox);
+						//char* tmp22 = new char[128];
+						//strcpy_s(tmp22, 128, msgbox);
 
-						chat_message.push_back(tmp22);
+						//client->m_vector_msg.push_back(tmp22);
 
-
+						client->send_chat_msg(msgbox);
 					}
 
 				}
@@ -279,35 +289,35 @@ int main(int, char**)
 
 
 			// log
-			//ImGui::Begin("logger");
-			//{
-			//	client->m_vector_msg;
+			ImGui::Begin("logger");
+			{
+				client->m_vector_msg;
 
-			//	const ImGuiWindowFlags child_flags = ImGuiWindowFlags_MenuBar;
-			//	ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
-			//	if (ImGui::BeginMenuBar())
-			//	{
-			//		ImGui::TextUnformatted(u8"체팅방 이름");
-			//		ImGui::EndMenuBar();
-			//	}
+				const ImGuiWindowFlags child_flags = ImGuiWindowFlags_MenuBar;
+				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
+				if (ImGui::BeginMenuBar())
+				{
+					ImGui::TextUnformatted(u8"체팅방 이름");
+					ImGui::EndMenuBar();
+				}
 
-			//	int track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
+				int track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
 
-			//	for (int item = 0; item < client->m_vector_msg.size(); item++)
-			//	{
-			//		if (item == track_item)
-			//		{
-			//			ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
-			//			ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
-			//		}
-			//		else
-			//		{
-			//			ImGui::Text(client->m_vector_msg[item].c_str());
-			//		}
-			//	}
-			//	ImGui::EndChild();
-			//}
-			//ImGui::End();
+				for (int item = 0; item < client->m_vector_msg.size(); item++)
+				{
+					if (item == track_item)
+					{
+						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
+						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
+					}
+					else
+					{
+						ImGui::Text(client->m_vector_msg[item].c_str());
+					}
+				}
+				ImGui::EndChild();
+			}
+			ImGui::End();
 		}
 
 
@@ -332,7 +342,7 @@ int main(int, char**)
 	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
 	// winsock2 사용 종료
-	//network->CleanUp();
+	network->CleanUp();
 
 	return 0;
 }

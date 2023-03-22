@@ -430,7 +430,7 @@ bool ClientProgram::PacketDispatcher(woodnet::TCPSocket* RecvSock, void* pPacket
 
 		case static_cast<INT16>(LOBBY_PACKET_ID::S2C_CHAT):
 		{
-			return on_packet_proc_enter_chat(RecvSock, pPacket, len);
+			return on_packet_proc_chat(RecvSock, pPacket, len);
 		}
 		break;
 
