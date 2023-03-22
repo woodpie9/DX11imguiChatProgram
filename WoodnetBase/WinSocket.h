@@ -42,6 +42,7 @@ public:
 	void Attach(SOCKET s);				// 소켓을 연결합니다.
 	SOCKET Detach();					// 소켓 연결을 제거합니다.
 
+	bool EventSelect(long lNetworkEvents);
 
 	bool Open(int iProtocol);			// 특정 전송 프토로콜에 맞추어 바인딩 된 소켓을 만듭니다.
 	bool Bind(SOCKADDR_IN& localAddr);	// 소켓에 로컬주소를 연결합니다.

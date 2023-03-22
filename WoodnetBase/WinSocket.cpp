@@ -28,6 +28,18 @@ SOCKET woodnet::WinSocket::Detach()
 	return s;
 }
 
+bool woodnet::WinSocket::EventSelect(long lNetworkEvents)
+{
+	if (m_hEvent_ == WSA_INVALID_EVENT)
+	{
+		if ((m_hEvent_ = WSACreateEvent()) == WSA_INVALID_EVENT) return false;
+	}
+
+	if (WSAEventSelect(m_socket_, m_hEvent_, lNetworkEvents) == SOCKET_ERROR) return false;
+
+	return true;
+}
+
 bool woodnet::WinSocket::Open(int iProtocol)
 {
 	if (iProtocol == IPPROTO_TCP)
