@@ -13,7 +13,6 @@
 #include <tchar.h>
 #include <vector>
 
-#include "convert_string.h"
 
 // Data
 static ID3D11Device* g_pd3dDevice = NULL;
@@ -96,7 +95,7 @@ int main(int, char**)
 	static char nickname[128] = "";
 	bool checkbox1 = false;
 	static char password[128] = "";
-	std::vector<const char*> chat_message;
+	std::vector<std::string> chat_message;
 	static char msgbox[128] = "";
 
 	// Main loop
@@ -173,7 +172,7 @@ int main(int, char**)
 			{
 				if (!isConnect && !isLogin && !isStartChat)
 				{
-					const char* IPlist[] = { "127.0.0.1", "192.168.0.11", "192.168.0.33"};
+					const char* IPlist[] = { "127.0.0.1", "192.168.0.11", "192.168.0.33" };
 					static int IP_current = 0;
 					ImGui::Combo("IP", &IP_current, IPlist, IM_ARRAYSIZE(IPlist));
 					ImGui::SameLine();
@@ -204,7 +203,7 @@ int main(int, char**)
 						ImGui::Text(password);
 					}
 
-					if(ImGui::Button(u8"접속 종료"))
+					if (ImGui::Button(u8"접속 종료"))
 					{
 						isConnect = false;
 					}
@@ -212,18 +211,44 @@ int main(int, char**)
 				}
 				else if (isConnect && isLogin && isStartChat)
 				{
+					static int track_item;
+					static bool enable_track = true;
+					static bool enable_extra_decorations = false;
+
+					ImGui::Checkbox("Decoration", &enable_extra_decorations);
+					ImGui::SameLine();
+					ImGui::Checkbox("Track", &enable_track);
+					//ImGui::PushItemWidth(100);
+
+
 					ImGui::Text(u8"체팅 메시지 박스");
 
-					ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true);
 
-					for (auto message : chat_message)
+					const ImGuiWindowFlags child_flags = enable_extra_decorations ? ImGuiWindowFlags_MenuBar : 0;
+					ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
+					if (ImGui::BeginMenuBar())
 					{
-						ImGui::Text(message);
+						ImGui::TextUnformatted(u8"체팅방 이름");
+						ImGui::EndMenuBar();
+					}
+					track_item = static_cast<int>(chat_message.size()) - 1;
+					for (int item = 0; item < chat_message.size(); item++)
+					{
+						if (enable_track && item == track_item)
+						{
+							ImGui::TextColored(ImVec4(1, 1, 0, 1), chat_message[item].c_str());
+							ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
+						}
+						else
+						{
+							ImGui::Text(chat_message[item].c_str());
+						}
 					}
 					ImGui::EndChild();
 
 
-					ImGui::InputTextWithHint("msgbox", "enter msg here", msgbox, IM_ARRAYSIZE(msgbox));
+					ImGui::InputTextWithHint(" ", "enter msg here", msgbox, IM_ARRAYSIZE(msgbox));
+					ImGui::SameLine();
 					if (ImGui::Button(u8"전송"))
 					{
 						char* tmp22 = new char[128];
@@ -231,7 +256,7 @@ int main(int, char**)
 
 						chat_message.push_back(tmp22);
 
-						
+
 					}
 
 				}
