@@ -109,7 +109,7 @@ private:
 	WSAEVENT m_Event;
 	woodnet::TCPSocket m_Connector;
 	int m_port = 5252;
-	int MyNetID;
+	int my_net_id_;
 
 	static const int PACKET_SIZE_MAX = 1024;
 	char m_PacketRecvBuf[PACKET_SIZE_MAX] = { 0, };

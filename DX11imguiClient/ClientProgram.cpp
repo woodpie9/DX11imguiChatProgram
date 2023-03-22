@@ -1,6 +1,6 @@
 #include <WS2tcpip.h>
 #include "ClientProgram.h"
-#include "../WoodnetBase/WoodnetProtocol.h"
+//#include "../WoodnetBase/WoodnetProtocol.h"
 
 static constexpr int PACKET_HEADER_SIZE = sizeof(PACKET_HEADER);
 
@@ -450,39 +450,142 @@ bool ClientProgram::PacketDispatcher(woodnet::TCPSocket* RecvSock, void* pPacket
 
 bool ClientProgram::on_packet_proc_accept(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	MSG_S2C_ACCEPT* S2CRcvPacket = static_cast<MSG_S2C_ACCEPT*>(pS2CPacket);
+
+	my_net_id_ = S2CRcvPacket->NetID;
+	m_vector_msg.push_back("Enter Server. NetID : " + std::to_string(my_net_id_));
+
+	return true;
 }
 
 bool ClientProgram::on_packet_proc_enter_lobby(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	m_vector_msg.emplace_back("pls set nickname");
+
+	return true;
 }
 
 bool ClientProgram::on_packet_proc_enter_chat(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
+	MSG_S2C_ENTER_CHAT_SER_OK* S2CRcvPacket = static_cast<MSG_S2C_ENTER_CHAT_SER_OK*>(pS2CPacket);
+
+	bool result = S2CRcvPacket->Result;
+
+	if (result == true)
+	{
+		m_vector_msg.emplace_back("success Into Chat room!!!");
+
+		return false;
+	}
+	else
+	{
+		m_vector_msg.emplace_back("fail into chat room...");
+
+		return true;
+	}
 }
 
 bool ClientProgram::on_packet_proc_new_player(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	MSG_S2C_NEW_PLAYER* S2CRcvPacket = static_cast<MSG_S2C_NEW_PLAYER*>(pS2CPacket);
+
+	std::string str = u8"새로운 클라이언트 접속. NetID : ";
+	INT32 id = S2CRcvPacket->NetID;
+	str += std::to_string(id);
+
+	str += " Name : ";
+	char Name[MAX_NICKNAME_LEN + 1];
+	memcpy(Name, S2CRcvPacket->NickName, MAX_NICKNAME_LEN + 1);
+	str += Name;
+
+	m_vector_msg.push_back(str);
+
+
+	return true;
 }
 
 bool ClientProgram::on_packet_proc_leave_player(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	MSG_S2C_LEAVE_PLAYER* S2CRcvPacket = static_cast<MSG_S2C_LEAVE_PLAYER*>(pS2CPacket);
+
+	std::string str = u8"클라이언트가 나갔습니다. NetID : ";
+	INT32 id = S2CRcvPacket->NetID;
+	str += std::to_string(id);
+
+	str += " Name : ";
+	char Name[MAX_NICKNAME_LEN + 1];
+	memcpy(Name, S2CRcvPacket->NickName, MAX_NICKNAME_LEN + 1);
+	str += Name;
+
+	m_vector_msg.push_back(str);
+
+
+	return true;
 }
 
 bool ClientProgram::on_packet_proc_change_name(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	MSG_S2C_CHANGE_NAME_OK* S2CRcvPacket = static_cast<MSG_S2C_CHANGE_NAME_OK*>(pS2CPacket);
+
+	std::string str = u8"클라이언트가 이름을 변경. NetID : ";
+	INT32 id = S2CRcvPacket->NetID;
+	str += std::to_string(id);
+
+	str += " Name : ";
+	char Name[MAX_NICKNAME_LEN + 1];
+	memcpy(Name, S2CRcvPacket->NickName, MAX_NICKNAME_LEN + 1);
+	str += Name;
+	
+	m_vector_msg.push_back(str);
+
+
+	return true;
 }
 
 bool ClientProgram::on_packet_proc_chat(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	MSG_S2C_CHAT* S2CRcvPacket = static_cast<MSG_S2C_CHAT*>(pS2CPacket);
+
+	std::string str = "NetID : ";
+	INT32 id = S2CRcvPacket->NetID;
+	str += std::to_string(id);
+
+	str += " Name : ";
+	char Name[MAX_NICKNAME_LEN + 1];
+	memcpy(Name, S2CRcvPacket->NickName, MAX_NICKNAME_LEN + 1);
+	str += Name;
+
+	str += " Chat : ";
+	char chat[MAX_CHATTING_LEN + 1];
+	memcpy(chat, S2CRcvPacket->MSG, MAX_CHATTING_LEN + 1);
+	str += chat;
+
+	m_vector_msg.push_back(str);
+
+	return true;
 }
 
 bool ClientProgram::on_packet_proc_notice(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	return false;
+	MSG_S2C_NOTICE* S2CRcvPacket = static_cast<MSG_S2C_NOTICE*>(pS2CPacket);
+
+	std::string str = "<<< 공지 !!! NetID : ";
+	INT32 id = S2CRcvPacket->NetID;
+	str += std::to_string(id);
+
+	str += " Name : ";
+	char Name[MAX_NICKNAME_LEN + 1];
+	memcpy(Name, S2CRcvPacket->NickName, MAX_NICKNAME_LEN + 1);
+	str += Name;
+
+	str += " Chat : ";
+	char chat[MAX_CHATTING_LEN + 1];
+	memcpy(chat, S2CRcvPacket->NickName, MAX_CHATTING_LEN + 1);
+	str += chat;
+
+	str += " >>>";
+	
+	m_vector_msg.push_back(str);
+
+	return true;
 }
