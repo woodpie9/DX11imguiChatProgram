@@ -3,6 +3,13 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 
+// Client
+#include "../woodnetBase/WinNetwork.h"
+woodnet::WinNetwork* network;
+#include "ClientProgram.h"
+ClientProgram* client;
+
+
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -31,9 +38,6 @@ void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-// Client
-//woodnet::WinNetwork* network;
-//ClientProgram* client;
 
 
 // Main code

@@ -4,10 +4,10 @@
 #include <vector>
 #include <WS2tcpip.h>
 
-#include "../woodnetBase/CommonDefines.h"
-#include "../woodnetBase/WinNetwork.h"
+//#include "../woodnetBase/CommonDefines.h"
+//#include "../woodnetBase/WinNetwork.h"
 #include "../woodnetBase/TCPSocket.h"
-#include "../woodnetBase/WoodnetProtocol.h"
+//#include "../woodnetBase/WoodnetProtocol.h"
 
 // 연결 상태를 제어한다.
 enum class ConnectionStatus
