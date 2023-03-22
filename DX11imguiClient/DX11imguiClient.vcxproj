@@ -157,7 +157,6 @@
     <ClInclude Include="..\WoodnetBase\WinSocket.h" />
     <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h" />
     <ClInclude Include="ClientProgram.h" />
-    <ClInclude Include="convert_string.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
