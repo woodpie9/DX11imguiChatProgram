@@ -10,9 +10,9 @@
 //#include "../woodnetBase/WoodnetProtocol.h"
 
 // 연결 상태를 제어한다.
-enum class ConnectionStatus
+enum class ConnectionStatus : int
 {
-	None,
+	None = 0,
 	Oppend,
 	SetEvent,
 	Connecting,
@@ -120,6 +120,6 @@ private:
 
 public:
 	std::vector<std::string> m_vector_msg;
-
+	std::vector<std::string> m_log_msg;
 
 };

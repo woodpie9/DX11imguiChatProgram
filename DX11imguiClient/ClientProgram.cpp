@@ -13,12 +13,12 @@ ClientProgram::ClientProgram() : OnClient(false), OnConnect(false)
 
 bool ClientProgram::init()
 {
-	m_vector_msg.emplace_back("init client...");
+	m_log_msg.emplace_back("init client...");
 
 	// 이미 init 완료함
 	if (OnClient)
 	{
-		m_vector_msg.emplace_back("already_init");
+		m_log_msg.emplace_back("already_init");
 		set_last_error(_Error::already_init);
 		return false;
 	}
@@ -26,7 +26,7 @@ bool ClientProgram::init()
 	// 이미 연결 되어있음
 	if (OnConnect)
 	{
-		m_vector_msg.emplace_back("already_connect");
+		m_log_msg.emplace_back("already_connect");
 		set_last_error(_Error::already_connect);
 		return false;
 	}
@@ -34,7 +34,7 @@ bool ClientProgram::init()
 	// 소켓을 연다.
 	if (m_Connector.Open(IPPROTO_TCP) == false)
 	{
-		m_vector_msg.emplace_back("socket open fail");
+		m_log_msg.emplace_back("socket open fail");
 		set_last_error(_Error::fatal);
 		OnConnect = false;
 		return false;
@@ -44,7 +44,7 @@ bool ClientProgram::init()
 	// 소켓에 내가 관심있는 이벤트를 지정한다.
 	if (m_Connector.EventSelect(FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE) == false)
 	{
-		m_vector_msg.emplace_back("eventselect fail");
+		m_log_msg.emplace_back("eventselect fail");
 		set_last_error(_Error::fatal);
 		OnConnect = false;
 		return false;
@@ -61,12 +61,12 @@ bool ClientProgram::init()
 bool ClientProgram::connect_server(std::string ConnectIP)
 {
 	bool result = false;
-	m_vector_msg.emplace_back("connecting server...");
+	m_log_msg.emplace_back("connecting server...");
 
 	// Init 필요
 	if (!OnClient)
 	{
-		m_vector_msg.emplace_back("not_init");
+		m_log_msg.emplace_back("not_init");
 		set_last_error(_Error::not_init);
 		return false;
 	}
@@ -74,7 +74,7 @@ bool ClientProgram::connect_server(std::string ConnectIP)
 	// 이미 연결 되어있음
 	if (OnConnect)
 	{
-		m_vector_msg.emplace_back("already_connect");
+		m_log_msg.emplace_back("already_connect");
 		set_last_error(_Error::already_connect);
 		return false;
 	}
@@ -88,7 +88,7 @@ bool ClientProgram::connect_server(std::string ConnectIP)
 	// 소켓의 정보로 서버에 연결한다.
 	if (m_Connector.Connect(ConnectAddr) == false)
 	{
-		m_vector_msg.emplace_back("connect fail");
+		m_log_msg.emplace_back("connect fail");
 		set_last_error(_Error::fatal);
 		OnConnect = false;
 		return false;
@@ -97,7 +97,7 @@ bool ClientProgram::connect_server(std::string ConnectIP)
 	// 이벤트를 등록한다.
 	m_Event = m_Connector.GetEventHandle();
 
-	m_vector_msg.push_back("Connect to " + ConnectIP + ":" + std::to_string(m_port));
+	m_log_msg.push_back("Connect to " + ConnectIP + ":" + std::to_string(m_port));
 	set_connection_status(ConnectionStatus::Connecting);
 
 	OnConnect = true;
@@ -108,7 +108,7 @@ bool ClientProgram::login_server()
 {
 	if (check_connect() == false) return false;
 
-	m_vector_msg.emplace_back("Login server...");
+	m_log_msg.emplace_back("Login server...");
 
 	static MSG_C2S_ENTER_LOBBY C2SSendPacket;
 
@@ -125,7 +125,7 @@ bool ClientProgram::set_nickname(std::string nickname)
 {
 	if (check_connect() == false) return false;
 
-	m_vector_msg.emplace_back("Set Nickname...");
+	m_log_msg.emplace_back("Set Nickname...");
 
 	static MSG_C2S_ENTER_CHAT_SER C2SSendPacket;
 
@@ -145,7 +145,7 @@ bool ClientProgram::change_name(std::string nickname)
 {
 	if (check_connect() == false) return false;
 
-	m_vector_msg.emplace_back("Change Nickname...");
+	m_log_msg.emplace_back("Change Nickname...");
 
 	static MSG_C2S_CHANGE_NAME C2SSendPacket;
 
@@ -169,7 +169,7 @@ bool ClientProgram::network_update()
 	static int EventReturn = 0;
 	if ((EventReturn = WSAWaitForMultipleEvents(1, &m_Event, FALSE, 1, FALSE)) == WSA_WAIT_FAILED)
 	{
-		m_vector_msg.push_back("Client::WSAWaitForMultipleEvents() failed with error " + std::to_string(WSAGetLastError()));
+		m_log_msg.push_back("WSAWaitForMultipleEvents() failed with error " + std::to_string(WSAGetLastError()));
 		set_last_error(_Error::fatal);
 		return false;
 	}
@@ -187,7 +187,7 @@ bool ClientProgram::network_update()
 	WSANETWORKEVENTS NetworkEvents;
 	if (WSAEnumNetworkEvents(m_Connector.GetHandle(), m_Connector.GetEventHandle(), &NetworkEvents) == SOCKET_ERROR)
 	{
-		m_vector_msg.push_back("Client::WSAEnumNetworkEvents() failed with error " + std::to_string(WSAGetLastError()));
+		m_log_msg.push_back("WSAEnumNetworkEvents() failed with error " + std::to_string(WSAGetLastError()));
 		set_last_error(_Error::error);
 		return false;
 	}
@@ -197,7 +197,7 @@ bool ClientProgram::network_update()
 	{
 		if (NetworkEvents.iErrorCode[FD_CONNECT_BIT] != 0)
 		{
-			m_vector_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
+			m_log_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
 			set_last_error(_Error::error);
 			return false;
 		}
@@ -210,7 +210,7 @@ bool ClientProgram::network_update()
 	{
 		if (NetworkEvents.iErrorCode[FD_CLOSE_BIT] != 0)
 		{
-			m_vector_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
+			m_log_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
 			set_last_error(_Error::error);
 			return false;
 		}
@@ -223,7 +223,7 @@ bool ClientProgram::network_update()
 	{
 		if (NetworkEvents.iErrorCode[FD_READ_BIT] != 0)
 		{
-			m_vector_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
+			m_log_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
 			set_last_error(_Error::error);
 			return false;
 		}
@@ -236,7 +236,7 @@ bool ClientProgram::network_update()
 	{
 		if (NetworkEvents.iErrorCode[FD_WRITE_BIT] != 0)
 		{
-			m_vector_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
+			m_log_msg.push_back("FD_CONNECT failed with error " + std::to_string(NetworkEvents.iErrorCode[FD_CONNECT_BIT]));
 			set_last_error(_Error::error);
 			return false;
 		}
@@ -289,7 +289,7 @@ bool ClientProgram::check_connect()
 	// Init 필요
 	if (!OnClient)
 	{
-		m_vector_msg.emplace_back("not_init");
+		m_log_msg.emplace_back("not_init");
 		set_last_error(_Error::not_init);
 		return false;
 	}
@@ -297,7 +297,7 @@ bool ClientProgram::check_connect()
 	// 이미 연결 되어있음
 	if (!OnConnect)
 	{
-		m_vector_msg.emplace_back("not_connect");
+		m_log_msg.emplace_back("not_connect");
 		set_last_error(_Error::not_connect);
 		return false;
 	}
@@ -311,7 +311,7 @@ bool ClientProgram::send(int PacketID, void* pPacket, int PacketLen)
 
 	if (m_Connector.PostPacket(static_cast<char*>(pPacket), PacketLen) == false)
 	{
-		m_vector_msg.emplace_back("PostPacket Fail");
+		m_log_msg.emplace_back("PostPacket Fail");
 		set_last_error(_Error::error);
 		return false;
 	}
@@ -329,7 +329,7 @@ void ClientProgram::send_flush()
 // 네트워크 이벤트 관리
 bool ClientProgram::on_net_connect(woodnet::TCPSocket* pThisSocket)
 {
-	m_vector_msg.emplace_back("Connect is OK!");
+	m_log_msg.emplace_back("Connect is OK!");
 	set_connection_status(ConnectionStatus::Connected);
 	set_last_error(_Error::success);
 	return true;
@@ -337,7 +337,7 @@ bool ClientProgram::on_net_connect(woodnet::TCPSocket* pThisSocket)
 
 bool ClientProgram::on_net_close(woodnet::TCPSocket* pThisSocket)
 {
-	m_vector_msg.emplace_back("close packet");
+	m_log_msg.emplace_back("close packet");
 	set_connection_status(ConnectionStatus::Closed);
 	set_last_error(_Error::success);
 	return true;
@@ -355,7 +355,7 @@ bool ClientProgram::on_net_recv(woodnet::TCPSocket* pThisSocket)
 
 		if (msgHeader.packet_size > PACKET_SIZE_MAX || msgHeader.packet_size < 0)
 		{
-			m_vector_msg.push_back("WinClient::OnNetRecv packet size error " + std::to_string(msgHeader.packet_size));
+			m_log_msg.push_back("OnNetRecv packet size error " + std::to_string(msgHeader.packet_size));
 			set_last_error(_Error::error);
 			continue;
 		}
@@ -368,7 +368,7 @@ bool ClientProgram::on_net_recv(woodnet::TCPSocket* pThisSocket)
 		}
 		else
 		{
-			m_vector_msg.emplace_back("Connector.ReadPacket return false!");
+			m_log_msg.emplace_back("Connector.ReadPacket return false!");
 			break;
 		}
 	}
@@ -442,7 +442,7 @@ bool ClientProgram::PacketDispatcher(woodnet::TCPSocket* RecvSock, void* pPacket
 
 		default:
 		{
-			m_vector_msg.push_back("Unknown Packet! id : " + std::to_string(pHeader->packet_id) + "size : " + std::to_string(pHeader->packet_size));
+			m_log_msg.push_back("Unknown Packet! id : " + std::to_string(pHeader->packet_id) + "size : " + std::to_string(pHeader->packet_size));
 			set_last_error(_Error::error);
 			return false;
 		}
@@ -455,14 +455,14 @@ bool ClientProgram::on_packet_proc_accept(woodnet::TCPSocket* RecvSock, void* pS
 	MSG_S2C_ACCEPT* S2CRcvPacket = static_cast<MSG_S2C_ACCEPT*>(pS2CPacket);
 
 	my_net_id_ = S2CRcvPacket->NetID;
-	m_vector_msg.push_back("Enter Server. NetID : " + std::to_string(my_net_id_));
+	m_log_msg.push_back("Enter Server. NetID : " + std::to_string(my_net_id_));
 
 	return true;
 }
 
 bool ClientProgram::on_packet_proc_enter_lobby(woodnet::TCPSocket* RecvSock, void* pS2CPacket, int C2SPacketLen)
 {
-	m_vector_msg.emplace_back("pls set nickname");
+	m_log_msg.emplace_back("pls set nickname");
 
 	return true;
 }
@@ -475,13 +475,13 @@ bool ClientProgram::on_packet_proc_enter_chat(woodnet::TCPSocket* RecvSock, void
 
 	if (result == true)
 	{
-		m_vector_msg.emplace_back("success Into Chat room!!!");
+		m_log_msg.emplace_back("success Into Chat room!!!");
 
 		return false;
 	}
 	else
 	{
-		m_vector_msg.emplace_back("fail into chat room...");
+		m_log_msg.emplace_back("fail into chat room...");
 
 		return true;
 	}
@@ -501,7 +501,7 @@ bool ClientProgram::on_packet_proc_new_player(woodnet::TCPSocket* RecvSock, void
 	str += Name;
 
 	m_vector_msg.push_back(str);
-
+	m_log_msg.push_back(str);
 
 	return true;
 }
@@ -520,7 +520,7 @@ bool ClientProgram::on_packet_proc_leave_player(woodnet::TCPSocket* RecvSock, vo
 	str += Name;
 
 	m_vector_msg.push_back(str);
-
+	m_log_msg.push_back(str);
 
 	return true;
 }
@@ -539,7 +539,7 @@ bool ClientProgram::on_packet_proc_change_name(woodnet::TCPSocket* RecvSock, voi
 	str += Name;
 	
 	m_vector_msg.push_back(str);
-
+	m_log_msg.push_back(str);
 
 	return true;
 }
@@ -563,6 +563,7 @@ bool ClientProgram::on_packet_proc_chat(woodnet::TCPSocket* RecvSock, void* pS2C
 	str += chat;
 
 	m_vector_msg.push_back(str);
+	m_log_msg.push_back(str);
 
 	return true;
 }
@@ -588,6 +589,7 @@ bool ClientProgram::on_packet_proc_notice(woodnet::TCPSocket* RecvSock, void* pS
 	str += " >>>";
 	
 	m_vector_msg.push_back(str);
+	m_log_msg.push_back(str);
 
 	return true;
 }

@@ -12,6 +12,10 @@ ClientProgram* client;
 #include "dx11Imgui.h"
 dx11Imgui* dx11_imgui;
 
+
+static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"Connecting",	"Connected",	"OnChat",	"Disconnected",	"Closed" };
+
+
 // Main code
 int main(int, char**)
 {
@@ -19,27 +23,25 @@ int main(int, char**)
 	bool show_demo_window = false;
 	bool show_another_window = false;
 	bool show_chatting_client = true;
+	bool show_logger_window = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	network = new woodnet::WinNetwork();
 	client = new ClientProgram();
+	dx11_imgui = new dx11Imgui();
 
 	// winsock2 사용 시작
 	network->Init();
 	client->init();
-
-	dx11_imgui = new dx11Imgui();
-
 	dx11_imgui->init();
 
 
 	bool isConnect = false;
 	bool isLogin = false;
 	bool isStartChat = false;
-	static char nickname[128] = "";
 	bool checkbox1 = false;
+	static char nickname[128] = "";
 	static char password[128] = "";
-	//std::vector<std::string> chat_message;
 	static char msgbox[128] = "";
 
 
@@ -48,7 +50,6 @@ int main(int, char**)
 	bool done = false;
 	while (!done)
 	{
-
 		// Poll and handle messages (inputs, window resize, etc.)
 		// See the WndProc() function below for our to dispatch events to the Win32 backend.
 		MSG msg;
@@ -65,15 +66,11 @@ int main(int, char**)
 
 		dx11_imgui->newframe();
 
-
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
 
-		// 한글 출력
-		//std::locale::global(std::locale("kor"));
-		std::string stdstr = u8"한글한글";
-		const char* str = u8"두글두글";
+
 
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 		{
@@ -82,17 +79,19 @@ int main(int, char**)
 
 			ImGui::Begin(u8"Hello, world! 한글도 출력");             // Create a window called "Hello, world!" and append into it.
 
+			// 한글 출력
+			std::string stdstr = u8"한글한글";
 			ImGui::Text(stdstr.c_str());
-			ImGui::Text(str);
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+			ImGui::Text("This is some useful text.");					// Display some text (you can use a format strings too)
+			ImGui::Checkbox("Demo Window", &show_demo_window);			// Edit bools storing our window open/close state
 			ImGui::Checkbox("Another Window", &show_another_window);
 			ImGui::Checkbox(u8"체팅 클라이언트", &show_chatting_client);
+			ImGui::Checkbox("logger window", &show_logger_window);
 
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::ColorEdit3("clear color", (float*)&clear_color);	// Edit 3 floats representing a color
 
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			if (ImGui::Button("Button"))								// Buttons return true when clicked (most widgets return true when edited/activated)
 				counter++;
 			ImGui::SameLine();
 			ImGui::Text("counter = %d", counter);
@@ -131,7 +130,7 @@ int main(int, char**)
 					if (ImGui::Button(u8"서버 접속"))
 					{
 						isConnect = true;
-						client->m_vector_msg.push_back(const_cast<char*>(IPlist[IP_current]));
+						client->m_log_msg.push_back(const_cast<char*>(IPlist[IP_current]));
 						client->connect_server(IPlist[IP_current]);
 					}
 				}
@@ -139,16 +138,16 @@ int main(int, char**)
 				{
 					ImGui::InputTextWithHint("Nickname", "enter text here", nickname, IM_ARRAYSIZE(nickname));
 
-					ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
-					ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
+					//ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
+					//ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
 					ImGui::SameLine();
 					if (ImGui::Button(u8"체팅 시작"))
 					{
 						client->login_server();
 						isLogin = true;
 						isStartChat = true;
-						client->m_vector_msg.push_back(nickname);
-						client->m_vector_msg.push_back(password);
+						client->m_log_msg.push_back(nickname);
+						client->m_log_msg.push_back(password);
 						client->set_nickname(nickname);
 					}
 
@@ -227,31 +226,36 @@ int main(int, char**)
 			// log
 			ImGui::Begin("logger");
 			{
-				client->m_vector_msg;
+				client->m_log_msg;
 
 				const ImGuiWindowFlags child_flags = ImGuiWindowFlags_MenuBar;
-				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
+				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true, child_flags);
 				if (ImGui::BeginMenuBar())
 				{
 					ImGui::TextUnformatted(u8"체팅방 이름");
 					ImGui::EndMenuBar();
 				}
 
-				int track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
+				int track_item = static_cast<int>(client->m_log_msg.size()) - 1;
 
-				for (int item = 0; item < client->m_vector_msg.size(); item++)
+				for (int item = 0; item < client->m_log_msg.size(); item++)
 				{
 					if (item == track_item)
 					{
-						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
+						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_log_msg[item].c_str());
 						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
 					}
 					else
 					{
-						ImGui::Text(client->m_vector_msg[item].c_str());
+						ImGui::Text(client->m_log_msg[item].c_str());
 					}
 				}
+
 				ImGui::EndChild();
+
+				ConnectionStatus connection = client->get_connection_status();
+
+				ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
 			}
 			ImGui::End();
 		}

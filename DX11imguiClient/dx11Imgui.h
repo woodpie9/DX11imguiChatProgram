@@ -14,9 +14,11 @@ public:
 	~dx11Imgui();
 
 	bool init();
-	bool render();
+	bool render() const;
 	bool newframe();
 	bool cleanup();
+
+	// 프레임 표시 등을 위한 Getter
 	ImGuiIO get_io() { return ImGui::GetIO(); };
 
 private:
