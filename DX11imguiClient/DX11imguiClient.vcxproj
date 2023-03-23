@@ -138,6 +138,7 @@
     <ClCompile Include="..\WoodnetBase\WinNetwork.cpp" />
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp" />
     <ClCompile Include="ClientProgram.cpp" />
+    <ClCompile Include="dx11Imgui.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
     <ClCompile Include="imgui_draw.cpp" />
@@ -146,7 +147,6 @@
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Simple_dx11.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WoodnetBase\CommonDefines.h" />
@@ -157,12 +157,12 @@
     <ClInclude Include="..\WoodnetBase\WinSocket.h" />
     <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h" />
     <ClInclude Include="ClientProgram.h" />
+    <ClInclude Include="dx11Imgui.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_win32.h" />
     <ClInclude Include="imgui_internal.h" />
-    <ClInclude Include="Simple_dx11.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
