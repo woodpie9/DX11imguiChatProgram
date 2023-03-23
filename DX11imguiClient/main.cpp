@@ -63,7 +63,7 @@ int main(int, char**)
 			break;
 
 
-		dx11_imgui->newprame();
+		dx11_imgui->newframe();
 
 
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
@@ -260,7 +260,7 @@ int main(int, char**)
 		dx11_imgui->render();
 	}
 
-	dx11_imgui->clenup();
+	dx11_imgui->cleanup();
 
 	// winsock2 사용 종료
 	network->CleanUp();
