@@ -1,15 +1,21 @@
 #include "dx11Imgui.h"
 
-// Helper functions
 
-dx11Imgui::dx11Imgui() :pd3dDevice(nullptr), pd3dDeviceContext(nullptr), pSwapChain(nullptr), mainRenderTargetView(nullptr)
+// 전역 선언, 전방선언
+ID3D11Device* pd3dDevice = nullptr;
+ID3D11DeviceContext* pd3dDeviceContext = nullptr;
+IDXGISwapChain* pSwapChain = nullptr;
+ID3D11RenderTargetView* mainRenderTargetView = nullptr;
+LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Helper functions
+dx11Imgui::dx11Imgui() //:pd3dDevice(nullptr), pd3dDeviceContext(nullptr), pSwapChain(nullptr), mainRenderTargetView(nullptr)
 {
 }
 
 dx11Imgui::~dx11Imgui()
 {
 }
-
 
 
 bool dx11Imgui::init()
@@ -25,7 +31,7 @@ bool dx11Imgui::init()
 	{
 		CleanupDeviceD3D();
 		::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-		return 1;
+		return false;
 	}
 
 	// Show the window
@@ -75,7 +81,7 @@ bool dx11Imgui::render()
 	return true;
 }
 
-bool dx11Imgui::newprame()
+bool dx11Imgui::newframe()
 {
 
 	// Start the Dear ImGui frame
@@ -86,7 +92,7 @@ bool dx11Imgui::newprame()
 	return true;
 }
 
-bool dx11Imgui::clenup()
+bool dx11Imgui::cleanup()
 {
 	// Cleanup
 	ImGui_ImplDX11_Shutdown();
@@ -158,14 +164,10 @@ void dx11Imgui::CleanupRenderTarget()
 	if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
 }
 
+
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// Win32 message handler
-// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
@@ -174,12 +176,12 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 		case WM_SIZE:
-			/*if (pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
+			if (pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
 			{
-				CleanupRenderTarget();
+				dx11Imgui:: CleanupRenderTarget();
 				pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-				CreateRenderTarget();
-			}*/
+				dx11Imgui::CreateRenderTarget();
+			}
 			return 0;
 		case WM_SYSCOMMAND:
 			if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu

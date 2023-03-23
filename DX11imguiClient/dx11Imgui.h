@@ -7,9 +7,6 @@
 #include <tchar.h>
 
 
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-
 class dx11Imgui
 {
 public:
@@ -18,8 +15,8 @@ public:
 
 	bool init();
 	bool render();
-	bool newprame();
-	bool clenup();
+	bool newframe();
+	bool cleanup();
 	ImGuiIO get_io() { return ImGui::GetIO(); };
 
 private:
@@ -27,17 +24,13 @@ private:
 	WNDCLASSEXW wc;
 	HWND hwnd;
 
-	// Data
-	ID3D11Device* pd3dDevice;
-	ID3D11DeviceContext* pd3dDeviceContext;
-	IDXGISwapChain* pSwapChain;
-	ID3D11RenderTargetView* mainRenderTargetView;
-
 	// helper functions
 	bool CreateDeviceD3D(HWND hWnd);
-	void CleanupDeviceD3D();
-	void CreateRenderTarget();
-	void CleanupRenderTarget();
 
+	// WndProc 에서 사용하기 위하여 static으로 변경 (resize에 필요)
+public:
+	static void CleanupDeviceD3D();
+	static void CreateRenderTarget();
+	static void CleanupRenderTarget();
 
 };
