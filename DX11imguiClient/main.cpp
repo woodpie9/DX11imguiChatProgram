@@ -6,11 +6,11 @@
 // Client
 #include "../woodnetBase/WinNetwork.h"
 #include "ClientProgram.h"
+#include "dx11Imgui.h"
+
 woodnet::WinNetwork* network;
 ClientProgram* client;
-
-#include "dx11Imgui.h"
-dx11Imgui* dx11_imgui;
+dx11Imgui* dx11_gui;
 
 
 static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"Connecting",	"Connected",	"OnChat",	"Disconnected",	"Closed" };
@@ -19,29 +19,26 @@ static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"C
 // Main code
 int main(int, char**)
 {
-	// Our state
+	// Window State
 	bool show_demo_window = false;
-	bool show_another_window = false;
 	bool show_chatting_client = true;
 	bool show_logger_window = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	network = new woodnet::WinNetwork();
 	client = new ClientProgram();
-	dx11_imgui = new dx11Imgui();
+	dx11_gui = new dx11Imgui();
 
 	// winsock2 사용 시작
 	network->Init();
 	client->init();
-	dx11_imgui->init();
-
+	dx11_gui->init();
 
 	bool isConnect = false;
 	bool checkbox1 = false;
 	static char nickname[128] = "";
 	static char password[128] = "";
 	static char msgbox[128] = "";
-
 
 
 	// Main loop
@@ -62,19 +59,21 @@ int main(int, char**)
 			break;
 
 
-		dx11_imgui->newframe();
+		// 화면을 갱신한다.
+		dx11_gui->newframe();
+
 
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
 
 
-
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 		{
 			static float f = 0.0f;
 			static int counter = 0;
-
+			ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2(30, 30));
 			ImGui::Begin(u8"Hello, world! 한글도 출력");             // Create a window called "Hello, world!" and append into it.
 
 			// 한글 출력
@@ -82,7 +81,6 @@ int main(int, char**)
 			ImGui::Text(stdstr.c_str());
 			ImGui::Text("This is some useful text.");					// Display some text (you can use a format strings too)
 			ImGui::Checkbox("Demo Window", &show_demo_window);			// Edit bools storing our window open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
 			ImGui::Checkbox(u8"체팅 클라이언트", &show_chatting_client);
 			ImGui::Checkbox("logger window", &show_logger_window);
 
@@ -94,28 +92,62 @@ int main(int, char**)
 			ImGui::SameLine();
 			ImGui::Text("counter = %d", counter);
 
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / dx11_imgui->get_io().Framerate, dx11_imgui->get_io().Framerate);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / dx11_gui->get_io().Framerate, dx11_gui->get_io().Framerate);
 			ImGui::End();
 		}
 
-		// 3. Show another simple window.
-		if (show_another_window)
+
+		if (show_logger_window)
 		{
-			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me"))
-				show_another_window = false;
+			// log
+			ImGui::SetNextWindowPos(ImVec2(30, 350));
+			ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Always);
+			ImGui::Begin("logger");
+			{
+				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true);
+
+				if(ImGui::BeginMenuBar())
+				{
+				ImGui::TextUnformatted(u8"Logger");
+				ImGui::EndMenuBar();
+
+					
+				}
+
+				const int track_item = static_cast<int>(client->m_log_msg.size()) - 1;
+				for (int item = 0; item < client->m_log_msg.size(); item++)
+				{
+					if (item == track_item)
+					{
+						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_log_msg[item].c_str());
+						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
+					}
+					else
+					{
+						ImGui::Text(client->m_log_msg[item].c_str());
+					}
+				}
+
+				ImGui::EndChild();
+
+				ConnectionStatus connection = client->get_connection_status();
+
+				ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
+			}
 			ImGui::End();
 		}
+
 
 		if (show_chatting_client)
 		{
 			if (isConnect == true)
 			{
-				// cliend loop
+				// client network loop
 				client->network_update();
 			}
-			ImGui::SetNextWindowSize(ImVec2(520, 500), ImGuiCond_FirstUseEver);
+
+			ImGui::SetNextWindowPos(ImVec2(600, 30));
+			ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_Always);
 			ImGui::Begin("Chatting Client");
 			{
 				if (!isConnect)
@@ -152,10 +184,10 @@ int main(int, char**)
 						ImGui::Text(password);
 					}
 
-					if (ImGui::Button(u8"접속 종료"))
+					/*if (ImGui::Button(u8"접속 종료"))
 					{
 						isConnect = false;
-					}
+					}*/
 
 				}
 				else if (isConnect && client->get_connection_status() == ConnectionStatus::OnChat)
@@ -211,57 +243,20 @@ int main(int, char**)
 				}
 				else
 				{
-					ImGui::Text(u8"여긴 누구 나는 어디");
+					ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
 				}
 
 
-			}
-			ImGui::End();
-
-
-			// log
-			ImGui::Begin("logger");
-			{
-				client->m_log_msg;
-
-				const ImGuiWindowFlags child_flags = ImGuiWindowFlags_MenuBar;
-				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true, child_flags);
-				if (ImGui::BeginMenuBar())
-				{
-					ImGui::TextUnformatted(u8"체팅방 이름");
-					ImGui::EndMenuBar();
-				}
-
-				int track_item = static_cast<int>(client->m_log_msg.size()) - 1;
-
-				for (int item = 0; item < client->m_log_msg.size(); item++)
-				{
-					if (item == track_item)
-					{
-						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_log_msg[item].c_str());
-						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
-					}
-					else
-					{
-						ImGui::Text(client->m_log_msg[item].c_str());
-					}
-				}
-
-				ImGui::EndChild();
-
-				ConnectionStatus connection = client->get_connection_status();
-
-				ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
 			}
 			ImGui::End();
 		}
 
 
-		dx11_imgui->render();
+		dx11_gui->render();
 	}
 
-	dx11_imgui->cleanup();
-
+	// dx11, imgui 사용 종료
+	dx11_gui->cleanup();
 	// winsock2 사용 종료
 	network->CleanUp();
 
