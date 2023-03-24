@@ -110,8 +110,6 @@ int main(int, char**)
 				{
 				ImGui::TextUnformatted(u8"Logger");
 				ImGui::EndMenuBar();
-
-					
 				}
 
 				const int track_item = static_cast<int>(client->m_log_msg.size()) - 1;
@@ -131,7 +129,6 @@ int main(int, char**)
 				ImGui::EndChild();
 
 				ConnectionStatus connection = client->get_connection_status();
-
 				ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
 			}
 			ImGui::End();
@@ -171,7 +168,7 @@ int main(int, char**)
 					//ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
 					//ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
 					ImGui::SameLine();
-					if (ImGui::Button(u8"체팅 시작"))
+					if (ImGui::Button(u8"체팅방 입장"))
 					{
 						client->login_server();
 						client->m_log_msg.push_back(nickname);
@@ -232,14 +229,12 @@ int main(int, char**)
 					ImGui::SameLine();
 					if (ImGui::Button(u8"전송"))
 					{
-						//char* tmp22 = new char[128];
-						//strcpy_s(tmp22, 128, msgbox);
-
-						//client->m_vector_msg.push_back(tmp22);
-
 						client->send_chat_msg(msgbox);
 					}
-
+				}
+				else if( isConnect && client->get_connection_status()==ConnectionStatus::Connecting)
+				{
+					ImGui::Text(u8"연결중... 로그창 확인!!");
 				}
 				else
 				{
@@ -252,7 +247,10 @@ int main(int, char**)
 		}
 
 
-		dx11_gui->render();
+		if(!dx11_gui->render())
+		{
+			return 0;
+		}
 	}
 
 	// dx11, imgui 사용 종료
