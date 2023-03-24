@@ -476,7 +476,7 @@ bool ClientProgram::on_packet_proc_enter_chat(woodnet::TCPSocket* RecvSock, void
 	if (result == true)
 	{
 		m_log_msg.emplace_back("success Into Chat room!!!");
-
+		set_connection_status(ConnectionStatus::OnChat);
 		return false;
 	}
 	else

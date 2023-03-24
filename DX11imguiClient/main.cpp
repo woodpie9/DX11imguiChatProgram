@@ -37,8 +37,6 @@ int main(int, char**)
 
 
 	bool isConnect = false;
-	bool isLogin = false;
-	bool isStartChat = false;
 	bool checkbox1 = false;
 	static char nickname[128] = "";
 	static char password[128] = "";
@@ -120,7 +118,7 @@ int main(int, char**)
 			ImGui::SetNextWindowSize(ImVec2(520, 500), ImGuiCond_FirstUseEver);
 			ImGui::Begin("Chatting Client");
 			{
-				if (!isConnect && !isLogin && !isStartChat)
+				if (!isConnect)
 				{
 					const char* IPlist[] = { "127.0.0.1", "192.168.0.11", "192.168.0.33" };
 					static int IP_current = 0;
@@ -134,7 +132,7 @@ int main(int, char**)
 						client->connect_server(IPlist[IP_current]);
 					}
 				}
-				else if (isConnect && !isLogin && !isStartChat)
+				else if (isConnect && client->get_connection_status() == ConnectionStatus::Connected)
 				{
 					ImGui::InputTextWithHint("Nickname", "enter text here", nickname, IM_ARRAYSIZE(nickname));
 
@@ -144,8 +142,6 @@ int main(int, char**)
 					if (ImGui::Button(u8"체팅 시작"))
 					{
 						client->login_server();
-						isLogin = true;
-						isStartChat = true;
 						client->m_log_msg.push_back(nickname);
 						client->m_log_msg.push_back(password);
 						client->set_nickname(nickname);
@@ -162,7 +158,7 @@ int main(int, char**)
 					}
 
 				}
-				else if (isConnect && isLogin && isStartChat)
+				else if (isConnect && client->get_connection_status() == ConnectionStatus::OnChat)
 				{
 					static int track_item;
 					static bool enable_track = true;
