@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX11imguiClient", "DX11imguiClient\DX11imguiClient.vcxproj", "{FA558615-58B8-4D5F-B40D-2A929AB7A4CA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImguiClient", "ImGuiClient\DX11imguiClient.vcxproj", "{FA558615-58B8-4D5F-B40D-2A929AB7A4CA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImguiServer", "ImGuiServer\DX11imguichatProgram.vcxproj", "{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{FA558615-58B8-4D5F-B40D-2A929AB7A4CA}.Release|x64.Build.0 = Release|x64
 		{FA558615-58B8-4D5F-B40D-2A929AB7A4CA}.Release|x86.ActiveCfg = Release|Win32
 		{FA558615-58B8-4D5F-B40D-2A929AB7A4CA}.Release|x86.Build.0 = Release|Win32
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Debug|x64.ActiveCfg = Debug|x64
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Debug|x64.Build.0 = Debug|x64
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Debug|x86.ActiveCfg = Debug|Win32
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Debug|x86.Build.0 = Debug|Win32
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Release|x64.ActiveCfg = Release|x64
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Release|x64.Build.0 = Release|x64
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Release|x86.ActiveCfg = Release|Win32
+		{D4D9CBE7-A6DA-4695-A232-2AC2F8EB223F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
