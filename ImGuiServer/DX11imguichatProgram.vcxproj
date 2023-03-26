@@ -34,7 +34,6 @@
     <ClInclude Include="..\WoodnetBase\WinNetwork.h" />
     <ClInclude Include="..\WoodnetBase\WinSocket.h" />
     <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h" />
-    <ClInclude Include="ClientProgram.h" />
     <ClInclude Include="dx11Imgui.h" />
     <ClInclude Include="LobbyManager.h" />
     <ClInclude Include="ServerProgram.h" />
@@ -52,7 +51,6 @@
     <ClCompile Include="..\WoodnetBase\UDPSocket.cpp" />
     <ClCompile Include="..\WoodnetBase\WinNetwork.cpp" />
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp" />
-    <ClCompile Include="ClientProgram.cpp" />
     <ClCompile Include="dx11Imgui.cpp" />
     <ClCompile Include="LobbyManager.cpp" />
     <ClCompile Include="main.cpp" />

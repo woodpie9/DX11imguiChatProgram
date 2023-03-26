@@ -28,18 +28,13 @@ public:
 	ServerProgram();
 	~ServerProgram();
 
-	void init(int listemPort = 5000);	// 소켓을 생성하고 리슨 포트를 지정합니다.
+	void init(int listemPort = 5252);	// 소켓을 생성하고 리슨 포트를 지정합니다.
 	void clean_up();					// 모든 소켓을 반납합니다.
 
 	bool listen();
 	bool update();
 	//bool close();
 
-	// 패킷 헤더에 유효한 값이 있다고 전재한다.
-	// 특정 유저에게 패킷을 보낸다.
-	bool send(NetworkObjectID NetworkID, void* pPacket, int PacketLen);
-	// 접속한 모든 유저에게 패킷을 보낸다.
-	bool broadcast(void* pPacket, int PacketLen);
 
 
 	ConnectionStatus get_m_connection_status() const
@@ -49,6 +44,12 @@ public:
 
 
 private:
+	// 패킷 헤더에 유효한 값이 있다고 전재한다.
+	// 특정 유저에게 패킷을 보낸다.
+	bool send(NetworkObjectID NetworkID, void* pPacket, int PacketLen);
+	// 접속한 모든 유저에게 패킷을 보낸다.
+	bool broadcast(void* pPacket, int PacketLen);
+
 	void set_m_connection_status(ConnectionStatus m_connection_status)
 	{
 		this->m_connection_status = m_connection_status;
@@ -90,9 +91,11 @@ private:
 	bool m_running = false;
 
 	ConnectionStatus m_connection_status;
-	std::vector<std::string> m_log_msg;
 
 	LobbyManager* lobby;
+
+public:
+	std::vector<std::string> m_log_msg;
 };
 
 template<typename T>

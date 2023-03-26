@@ -5,15 +5,15 @@
 
 // Client
 #include "../woodnetBase/WinNetwork.h"
-#include "ClientProgram.h"
+#include "ServerProgram.h"
 #include "dx11Imgui.h"
 
 woodnet::WinNetwork* network;
-ClientProgram* client;
+ServerProgram* server;
 dx11Imgui* dx11_gui;
 
 
-static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"Connecting",	"Connected",	"OnChat",	"Disconnected",	"Closed" };
+//static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"Connecting",	"Connected",	"OnChat",	"Disconnected",	"Closed" };
 
 
 // Main code
@@ -21,17 +21,17 @@ int main(int, char**)
 {
 	// Window State
 	bool show_demo_window = false;
-	bool show_chatting_client = true;
+	bool show_chatting_server = true;
 	bool show_logger_window = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	network = new woodnet::WinNetwork();
-	client = new ClientProgram();
+	server = new ServerProgram();
 	dx11_gui = new dx11Imgui();
 
 	// winsock2 사용 시작
 	network->Init();
-	client->init();
+	server->init();
 	dx11_gui->init();
 
 	bool isConnect = false;
@@ -81,7 +81,7 @@ int main(int, char**)
 			ImGui::Text(stdstr.c_str());
 			ImGui::Text("This is some useful text.");					// Display some text (you can use a format strings too)
 			ImGui::Checkbox("Demo Window", &show_demo_window);			// Edit bools storing our window open/close state
-			ImGui::Checkbox(u8"체팅 클라이언트", &show_chatting_client);
+			ImGui::Checkbox(u8"체팅 클라이언트", &show_chatting_server);
 			ImGui::Checkbox("logger window", &show_logger_window);
 
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f
@@ -106,140 +106,143 @@ int main(int, char**)
 			{
 				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true);
 
-				if(ImGui::BeginMenuBar())
+				if (ImGui::BeginMenuBar())
 				{
-				ImGui::TextUnformatted(u8"Logger");
-				ImGui::EndMenuBar();
+					ImGui::TextUnformatted(u8"Logger");
+					ImGui::EndMenuBar();
 				}
 
-				const int track_item = static_cast<int>(client->m_log_msg.size()) - 1;
-				for (int item = 0; item < client->m_log_msg.size(); item++)
+				const int track_item = static_cast<int>(server->m_log_msg.size()) - 1;
+				for (int item = 0; item < server->m_log_msg.size(); item++)
 				{
 					if (item == track_item)
 					{
-						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_log_msg[item].c_str());
+						ImGui::TextColored(ImVec4(1, 1, 0, 1), server->m_log_msg[item].c_str());
 						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
 					}
 					else
 					{
-						ImGui::Text(client->m_log_msg[item].c_str());
+						ImGui::Text(server->m_log_msg[item].c_str());
 					}
 				}
 
 				ImGui::EndChild();
 
-				ConnectionStatus connection = client->get_connection_status();
-				ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
+				//ConnectionStatus connection = server->get_connection_status();
+				//ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
 			}
 			ImGui::End();
 		}
 
 
-		if (show_chatting_client)
+		if (show_chatting_server)
 		{
-			if (isConnect == true)
-			{
-				// client network loop
-				client->network_update();
-			}
-
 			ImGui::SetNextWindowPos(ImVec2(600, 30));
 			ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_Always);
 			ImGui::Begin("Chatting Client");
 			{
 				if (!isConnect)
 				{
-					const char* IPlist[] = { "127.0.0.1", "192.168.0.11", "192.168.0.33" };
-					static int IP_current = 0;
-					ImGui::Combo("IP", &IP_current, IPlist, IM_ARRAYSIZE(IPlist));
-					ImGui::SameLine();
+					//const char* IPlist[] = { "127.0.0.1", "192.168.0.11", "192.168.0.33" };
+					//static int IP_current = 0;
+					//ImGui::Combo("IP", &IP_current, IPlist, IM_ARRAYSIZE(IPlist));
+					//ImGui::SameLine();
 
-					if (ImGui::Button(u8"서버 접속"))
+					if (ImGui::Button(u8"서버 시작"))
 					{
 						isConnect = true;
-						client->m_log_msg.push_back(const_cast<char*>(IPlist[IP_current]));
-						client->connect_server(IPlist[IP_current]);
+						server->listen();
 					}
 				}
-				else if (isConnect && client->get_connection_status() == ConnectionStatus::Connected)
+				else if(isConnect)
 				{
-					ImGui::InputTextWithHint("Nickname", "enter text here", nickname, IM_ARRAYSIZE(nickname));
+					ImGui::Button(u8"서버 작동중... 로그 확인");
+					server->update();
 
-					//ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
-					//ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
-					ImGui::SameLine();
-					if (ImGui::Button(u8"체팅방 입장"))
-					{
-						client->login_server();
-						client->m_log_msg.push_back(nickname);
-						client->m_log_msg.push_back(password);
-						client->set_nickname(nickname);
-					}
-
-					if (checkbox1)
-					{
-						ImGui::Text(password);
-					}
-
-					/*if (ImGui::Button(u8"접속 종료"))
-					{
-						isConnect = false;
-					}*/
-
-				}
-				else if (isConnect && client->get_connection_status() == ConnectionStatus::OnChat)
-				{
-					static int track_item;
-					static bool enable_track = true;
-					static bool enable_extra_decorations = false;
-
-					ImGui::Checkbox("Decoration", &enable_extra_decorations);
-					ImGui::SameLine();
-					ImGui::Checkbox("Track", &enable_track);
-					//ImGui::PushItemWidth(100);
-
-
-					ImGui::Text(u8"체팅 메시지 박스");
-
-
-					const ImGuiWindowFlags child_flags = enable_extra_decorations ? ImGuiWindowFlags_MenuBar : 0;
-					ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
-					if (ImGui::BeginMenuBar())
-					{
-						ImGui::TextUnformatted(u8"체팅방 이름");
-						ImGui::EndMenuBar();
-					}
-					track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
-					for (int item = 0; item < client->m_vector_msg.size(); item++)
-					{
-						if (enable_track && item == track_item)
-						{
-							ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
-							ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
-						}
-						else
-						{
-							ImGui::Text(client->m_vector_msg[item].c_str());
-						}
-					}
-					ImGui::EndChild();
-
-
-					ImGui::InputTextWithHint(" ", "enter msg here", msgbox, IM_ARRAYSIZE(msgbox));
-					ImGui::SameLine();
-					if (ImGui::Button(u8"전송"))
-					{
-						client->send_chat_msg(msgbox);
-					}
-				}
-				else if( isConnect && client->get_connection_status()==ConnectionStatus::Connecting)
-				{
-					ImGui::Text(u8"연결중... 로그창 확인!!");
 				}
 				else
 				{
 					ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
 				}
+				//		else if (isConnect && client->get_connection_status() == ConnectionStatus::Connected)
+				//		{
+				//			ImGui::InputTextWithHint("Nickname", "enter text here", nickname, IM_ARRAYSIZE(nickname));
+
+				//			//ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
+				//			//ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
+				//			ImGui::SameLine();
+				//			if (ImGui::Button(u8"체팅방 입장"))
+				//			{
+				//				client->login_server();
+				//				client->m_log_msg.push_back(nickname);
+				//				client->m_log_msg.push_back(password);
+				//				client->set_nickname(nickname);
+				//			}
+
+				//			if (checkbox1)
+				//			{
+				//				ImGui::Text(password);
+				//			}
+
+				//			/*if (ImGui::Button(u8"접속 종료"))
+				//			{
+				//				isConnect = false;
+				//			}*/
+
+				//		}
+				//		else if (isConnect && client->get_connection_status() == ConnectionStatus::OnChat)
+				//		{
+				//			static int track_item;
+				//			static bool enable_track = true;
+				//			static bool enable_extra_decorations = false;
+
+				//			ImGui::Checkbox("Decoration", &enable_extra_decorations);
+				//			ImGui::SameLine();
+				//			ImGui::Checkbox("Track", &enable_track);
+				//			//ImGui::PushItemWidth(100);
+
+
+				//			ImGui::Text(u8"체팅 메시지 박스");
+
+
+				//			const ImGuiWindowFlags child_flags = enable_extra_decorations ? ImGuiWindowFlags_MenuBar : 0;
+				//			ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
+				//			if (ImGui::BeginMenuBar())
+				//			{
+				//				ImGui::TextUnformatted(u8"체팅방 이름");
+				//				ImGui::EndMenuBar();
+				//			}
+				//			track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
+				//			for (int item = 0; item < client->m_vector_msg.size(); item++)
+				//			{
+				//				if (enable_track && item == track_item)
+				//				{
+				//					ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
+				//					ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
+				//				}
+				//				else
+				//				{
+				//					ImGui::Text(client->m_vector_msg[item].c_str());
+				//				}
+				//			}
+				//			ImGui::EndChild();
+
+
+				//			ImGui::InputTextWithHint(" ", "enter msg here", msgbox, IM_ARRAYSIZE(msgbox));
+				//			ImGui::SameLine();
+				//			if (ImGui::Button(u8"전송"))
+				//			{
+				//				client->send_chat_msg(msgbox);
+				//			}
+				//		}
+				//		else if( isConnect && client->get_connection_status()==ConnectionStatus::Connecting)
+				//		{
+				//			ImGui::Text(u8"연결중... 로그창 확인!!");
+				//		}
+				//		else
+				//		{
+				//			ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
+				//		}
 
 
 			}
@@ -247,7 +250,7 @@ int main(int, char**)
 		}
 
 
-		if(!dx11_gui->render())
+		if (!dx11_gui->render())
 		{
 			return 0;
 		}

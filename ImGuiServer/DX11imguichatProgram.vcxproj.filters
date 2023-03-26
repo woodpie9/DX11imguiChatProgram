@@ -66,9 +66,6 @@
     <ClInclude Include="dx11Imgui.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ClientProgram.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ServerProgram.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -112,9 +109,6 @@
     </ClCompile>
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp">
       <Filter>WoodnetBase</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientProgram.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="dx11Imgui.cpp">
       <Filter>소스 파일</Filter>

@@ -26,6 +26,8 @@ void ServerProgram::init(int listemPort)
 	// 로비 매니저 생성
 	this->lobby = new LobbyManager();
 	set_m_connection_status(ConnectionStatus::Init);
+	m_log_msg.push_back("init :" + m_listen_ip + ":" + std::to_string(m_listen_port));
+
 }
 
 void ServerProgram::clean_up()
@@ -73,7 +75,7 @@ bool ServerProgram::listen()
 		m_log_msg.emplace_back("fail listen");
 		return false;
 	}
-	m_log_msg.push_back("리슨 시작" + m_listen_ip + ":" + std::to_string(m_listen_port));
+	m_log_msg.push_back("listen start :" + m_listen_ip + ":" + std::to_string(m_listen_port));
 
 	// Generator로 숫자를 증가시키자! 리슨은 0번. 숫자를 리턴하고 갯수를 증가시킨다.
 	m_event_table[socket_count_generator()] = m_listen_ptr->GetEventHandle();
