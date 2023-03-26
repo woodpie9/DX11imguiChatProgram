@@ -27,7 +27,7 @@ public:
 	~TCPSocket();
 
 	// 클라이언트가 서버에 연결하기 위해 IP주소와 포트번호 연동
-	bool Connect(SOCKADDR_IN& remoteAddr) const;		
+	bool Connect(SOCKADDR_IN& remoteAddr) const;
 	// 서버가 들어오는 연결을 듣기 위하여 소켓을 배치합니다.
 	bool Listen();
 
@@ -47,8 +47,9 @@ public:
 	void Reset();
 
 
-	void SetNetID(NetworkObjectID ID);
-	NetworkObjectID GetNetID();
+	void SetNetID(NetworkObjectID ID) { m_NetID = ID; };
+	NetworkObjectID GetNetID() { return m_NetID; };
+
 
 protected:
 	NetworkObjectID m_NetID;
