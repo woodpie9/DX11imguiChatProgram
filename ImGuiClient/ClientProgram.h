@@ -106,16 +106,16 @@ private:
 	_Error m_last_error_ = _Error::not_init;
 
 private:
-	WSAEVENT m_Event;
-	woodnet::TCPSocket m_Connector;
+	WSAEVENT m_event;
+	woodnet::TCPSocket m_connector;
 	int m_port = 5252;
 	int my_net_id_;
 	
-	char m_PacketRecvBuf[PACKET_SIZE_MAX] = { 0, };
+	char m_packet_recv_buf[PACKET_SIZE_MAX] = { 0, };
 
 
-	bool OnClient;
-	bool OnConnect;
+	bool on_client;
+	bool on_connect;
 
 public:
 	std::vector<std::string> m_vector_msg;
