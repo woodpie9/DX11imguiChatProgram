@@ -6,7 +6,7 @@
 
 static constexpr int PACKET_HEADER_SIZE = sizeof(PACKET_HEADER);
 
-ClientProgram::ClientProgram() : OnClient(false), OnConnect(false)
+ClientProgram::ClientProgram() : on_client(false), on_connect(false)
 {
 	set_last_error(_Error::success);
 }
@@ -16,7 +16,7 @@ bool ClientProgram::init()
 	m_log_msg.emplace_back("init client...");
 
 	// 이미 init 완료함
-	if (OnClient)
+	if (on_client)
 	{
 		m_log_msg.emplace_back("already_init");
 		set_last_error(_Error::already_init);
@@ -24,7 +24,7 @@ bool ClientProgram::init()
 	}
 
 	// 이미 연결 되어있음
-	if (OnConnect)
+	if (on_connect)
 	{
 		m_log_msg.emplace_back("already_connect");
 		set_last_error(_Error::already_connect);
@@ -32,27 +32,27 @@ bool ClientProgram::init()
 	}
 
 	// 소켓을 연다.
-	if (m_Connector.Open(IPPROTO_TCP) == false)
+	if (m_connector.Open(IPPROTO_TCP) == false)
 	{
 		m_log_msg.emplace_back("socket open fail");
 		set_last_error(_Error::fatal);
-		OnConnect = false;
+		on_connect = false;
 		return false;
 	}
 	set_connection_status(ConnectionStatus::Oppend);
 
 	// 소켓에 내가 관심있는 이벤트를 지정한다.
-	if (m_Connector.EventSelect(FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE) == false)
+	if (m_connector.EventSelect(FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE) == false)
 	{
 		m_log_msg.emplace_back("eventselect fail");
 		set_last_error(_Error::fatal);
-		OnConnect = false;
+		on_connect = false;
 		return false;
 	}
 	set_connection_status(ConnectionStatus::SetEvent);
 
 
-	OnClient = true;
+	on_client = true;
 
 	set_last_error(_Error::success);
 	return  true;
@@ -64,7 +64,7 @@ bool ClientProgram::connect_server(std::string ConnectIP)
 	m_log_msg.emplace_back("connecting server...");
 
 	// Init 필요
-	if (!OnClient)
+	if (!on_client)
 	{
 		m_log_msg.emplace_back("not_init");
 		set_last_error(_Error::not_init);
@@ -72,7 +72,7 @@ bool ClientProgram::connect_server(std::string ConnectIP)
 	}
 
 	// 이미 연결 되어있음
-	if (OnConnect)
+	if (on_connect)
 	{
 		m_log_msg.emplace_back("already_connect");
 		set_last_error(_Error::already_connect);
@@ -86,21 +86,21 @@ bool ClientProgram::connect_server(std::string ConnectIP)
 	ConnectAddr.sin_port = htons(m_port);
 
 	// 소켓의 정보로 서버에 연결한다.
-	if (m_Connector.Connect(ConnectAddr) == false)
+	if (m_connector.Connect(ConnectAddr) == false)
 	{
 		m_log_msg.emplace_back("connect fail");
 		set_last_error(_Error::fatal);
-		OnConnect = false;
+		on_connect = false;
 		return false;
 	}
 
 	// 이벤트를 등록한다.
-	m_Event = m_Connector.GetEventHandle();
+	m_event = m_connector.GetEventHandle();
 
 	m_log_msg.push_back("Connect to " + ConnectIP + ":" + std::to_string(m_port));
 	set_connection_status(ConnectionStatus::Connecting);
 
-	OnConnect = true;
+	on_connect = true;
 	return true;
 }
 
@@ -116,7 +116,7 @@ bool ClientProgram::login_server()
 	C2SSendPacket.packet_id = static_cast<INT16>(LOBBY_PACKET_ID::C2S_ENTER_LOBBY);
 	C2SSendPacket.seqNum = 1;
 
-	m_Connector.PostPacket(reinterpret_cast<char*>(&C2SSendPacket), C2SSendPacket.packet_size);
+	m_connector.PostPacket(reinterpret_cast<char*>(&C2SSendPacket), C2SSendPacket.packet_size);
 
 	return true;
 }
@@ -136,7 +136,7 @@ bool ClientProgram::set_nickname(std::string nickname)
 	const char* cstr = nickname.c_str();
 	memcpy(C2SSendPacket.NickName, cstr, MAX_NICKNAME_LEN + 1);
 
-	m_Connector.PostPacket((char*)&C2SSendPacket, C2SSendPacket.packet_size);
+	m_connector.PostPacket((char*)&C2SSendPacket, C2SSendPacket.packet_size);
 
 	return true;
 }
@@ -156,7 +156,7 @@ bool ClientProgram::change_name(std::string nickname)
 	const char* cstr = nickname.c_str();
 	memcpy(C2SSendPacket.NickName, cstr, MAX_NICKNAME_LEN + 1);
 
-	m_Connector.PostPacket(reinterpret_cast<char*>(&C2SSendPacket), C2SSendPacket.packet_size);
+	m_connector.PostPacket(reinterpret_cast<char*>(&C2SSendPacket), C2SSendPacket.packet_size);
 
 	return true;
 }
@@ -167,7 +167,7 @@ bool ClientProgram::network_update()
 
 	// 새로 들어온 이벤트가 있는지 확인한다.
 	static int EventReturn = 0;
-	if ((EventReturn = WSAWaitForMultipleEvents(1, &m_Event, FALSE, 1, FALSE)) == WSA_WAIT_FAILED)
+	if ((EventReturn = WSAWaitForMultipleEvents(1, &m_event, FALSE, 1, FALSE)) == WSA_WAIT_FAILED)
 	{
 		m_log_msg.push_back("WSAWaitForMultipleEvents() failed with error " + std::to_string(WSAGetLastError()));
 		set_last_error(_Error::fatal);
@@ -185,7 +185,7 @@ bool ClientProgram::network_update()
 
 	// 이번에 받은 이벤트가 어떤건지 확인한다.
 	WSANETWORKEVENTS NetworkEvents;
-	if (WSAEnumNetworkEvents(m_Connector.GetHandle(), m_Connector.GetEventHandle(), &NetworkEvents) == SOCKET_ERROR)
+	if (WSAEnumNetworkEvents(m_connector.GetHandle(), m_connector.GetEventHandle(), &NetworkEvents) == SOCKET_ERROR)
 	{
 		m_log_msg.push_back("WSAEnumNetworkEvents() failed with error " + std::to_string(WSAGetLastError()));
 		set_last_error(_Error::error);
@@ -202,7 +202,7 @@ bool ClientProgram::network_update()
 			return false;
 		}
 
-		on_net_connect(&m_Connector);
+		on_net_connect(&m_connector);
 	}
 
 
@@ -215,7 +215,7 @@ bool ClientProgram::network_update()
 			return false;
 		}
 
-		on_net_connect(&m_Connector);
+		on_net_connect(&m_connector);
 	}
 
 
@@ -228,7 +228,7 @@ bool ClientProgram::network_update()
 			return false;
 		}
 
-		on_net_recv(&m_Connector);
+		on_net_recv(&m_connector);
 	}
 
 
@@ -241,7 +241,7 @@ bool ClientProgram::network_update()
 			return false;
 		}
 
-		on_net_connect(&m_Connector);
+		on_net_connect(&m_connector);
 	}
 
 	return true;
@@ -251,7 +251,7 @@ bool ClientProgram::network_update()
 //{
 //	if (check_connect() == false) return false;
 //
-//	m_Connector.Close();
+//	m_connector.Close();
 //
 //	return false;
 //}
@@ -260,7 +260,7 @@ bool ClientProgram::close()
 {
 	if (check_connect() == false) return false;
 
-	m_Connector.Close();
+	m_connector.Close();
 
 	return true;
 }
@@ -278,7 +278,7 @@ bool ClientProgram::send_chat_msg(std::string msg)
 	const char* cMSG = msg.c_str();
 	memcpy(C2SSendPacket.MSG, cMSG, MAX_CHATTING_LEN + 1);
 
-	m_Connector.PostPacket(reinterpret_cast<char*>(&C2SSendPacket), C2SSendPacket.packet_size);
+	m_connector.PostPacket(reinterpret_cast<char*>(&C2SSendPacket), C2SSendPacket.packet_size);
 
 
 	return true;
@@ -287,7 +287,7 @@ bool ClientProgram::send_chat_msg(std::string msg)
 bool ClientProgram::check_connect()
 {
 	// Init 필요
-	if (!OnClient)
+	if (!on_client)
 	{
 		m_log_msg.emplace_back("not_init");
 		set_last_error(_Error::not_init);
@@ -295,7 +295,7 @@ bool ClientProgram::check_connect()
 	}
 
 	// 이미 연결 되어있음
-	if (!OnConnect)
+	if (!on_connect)
 	{
 		m_log_msg.emplace_back("not_connect");
 		set_last_error(_Error::not_connect);
@@ -309,7 +309,7 @@ bool ClientProgram::send(int PacketID, void* pPacket, int PacketLen)
 {
 	if (check_connect() == false) return false;
 
-	if (m_Connector.PostPacket(static_cast<char*>(pPacket), PacketLen) == false)
+	if (m_connector.PostPacket(static_cast<char*>(pPacket), PacketLen) == false)
 	{
 		m_log_msg.emplace_back("PostPacket Fail");
 		set_last_error(_Error::error);
@@ -321,7 +321,7 @@ bool ClientProgram::send(int PacketID, void* pPacket, int PacketLen)
 
 void ClientProgram::send_flush()
 {
-	m_Connector.SendUpdate();
+	m_connector.SendUpdate();
 }
 
 
@@ -346,12 +346,12 @@ bool ClientProgram::on_net_close(woodnet::TCPSocket* pThisSocket)
 bool ClientProgram::on_net_recv(woodnet::TCPSocket* pThisSocket)
 {
 	static PACKET_HEADER msgHeader;
-	m_Connector.RecvUpdate();
+	m_connector.RecvUpdate();
 
-	while (m_Connector.PeekPacket(reinterpret_cast<char*>(&msgHeader), PACKET_HEADER_SIZE))
+	while (m_connector.PeekPacket(reinterpret_cast<char*>(&msgHeader), PACKET_HEADER_SIZE))
 	{
 		// 온전한 패킷이 있다면 패킷을 만들어서 처리.
-		memset(&m_PacketRecvBuf, 0, PACKET_SIZE_MAX);
+		memset(&m_packet_recv_buf, 0, PACKET_SIZE_MAX);
 
 		if (msgHeader.packet_size > PACKET_SIZE_MAX || msgHeader.packet_size < 0)
 		{
@@ -361,10 +361,10 @@ bool ClientProgram::on_net_recv(woodnet::TCPSocket* pThisSocket)
 		}
 
 		// 크기가 알맞는 하나의 패킷을 읽어온다.
-		if (m_Connector.ReadPacket(m_PacketRecvBuf, msgHeader.packet_size))
+		if (m_connector.ReadPacket(m_packet_recv_buf, msgHeader.packet_size))
 		{
 			// 패킷을 해석하고 알맞는 동작을 한다.
-			PacketDispatcher(pThisSocket, m_PacketRecvBuf, msgHeader.packet_size);
+			PacketDispatcher(pThisSocket, m_packet_recv_buf, msgHeader.packet_size);
 		}
 		else
 		{
