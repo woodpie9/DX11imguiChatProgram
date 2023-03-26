@@ -16,6 +16,9 @@
     <Filter Include="Imgui">
       <UniqueIdentifier>{b58cbcd5-e4d1-42e9-9663-9f2fe6c24c4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{d92c0241-43a2-4782-ba30-631158ef3a82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ImGui\imconfig.h">
@@ -70,7 +73,7 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="LobbyManager.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -120,7 +123,7 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="LobbyManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
