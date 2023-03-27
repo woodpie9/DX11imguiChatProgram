@@ -112,17 +112,17 @@ int main(int, char**)
 					ImGui::EndMenuBar();
 				}
 
-				const int track_item = static_cast<int>(server->m_log_msg.size()) - 1;
-				for (int item = 0; item < server->m_log_msg.size(); item++)
+				const int track_item = static_cast<int>(server->log_msg.size()) - 1;
+				for (int item = 0; item < server->log_msg.size(); item++)
 				{
 					if (item == track_item)
 					{
-						ImGui::TextColored(ImVec4(1, 1, 0, 1), server->m_log_msg[item].c_str());
+						ImGui::TextColored(ImVec4(1, 1, 0, 1), server->log_msg[item].c_str());
 						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
 					}
 					else
 					{
-						ImGui::Text(server->m_log_msg[item].c_str());
+						ImGui::Text(server->log_msg[item].c_str());
 					}
 				}
 

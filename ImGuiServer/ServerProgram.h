@@ -39,7 +39,7 @@ public:
 
 	ConnectionStatus get_m_connection_status() const
 	{
-		return m_connection_status;
+		return connection_status_;
 	}
 
 
@@ -52,7 +52,7 @@ private:
 
 	void set_m_connection_status(ConnectionStatus m_connection_status)
 	{
-		this->m_connection_status = m_connection_status;
+		this->connection_status_ = m_connection_status;
 	}
 
 	void on_net_accept(woodnet::TCPSocket* pThisSocket);
@@ -62,8 +62,8 @@ private:
 
 	void get_client_IPPort(SOCKET ClientSocket, char* ipPort);
 
-	NetworkObjectID net_id_generator() { return m_netID++; };
-	int socket_count_generator() { return m_socket_cnt++; };
+	NetworkObjectID net_id_generator() { return net_id_++; };
+	int socket_count_generator() { return socket_cnt_++; };
 
 private:
 	void packet_dispatcher(woodnet::TCPSocket* pRecvSocket, void* pPacket, int len);
@@ -77,25 +77,22 @@ private:
 
 
 private:
-	NetworkObjectID m_netID;		// 클라이언트를 구분하는 숫자
-	int m_socket_cnt;				// 소켓의 전체 개수
-	WSAEVENT m_event_table[WSA_MAXIMUM_WAIT_EVENTS] = { 0, };
-	woodnet::TCPSocket* m_socket_ptr_table[WSA_MAXIMUM_WAIT_EVENTS] = { nullptr, };
-	woodnet::TCPSocket* m_listen_ptr = nullptr;
+	NetworkObjectID net_id_;		// 클라이언트를 구분하는 숫자
+	int socket_cnt_;				// 소켓의 전체 개수
+	WSAEVENT event_table_[WSA_MAXIMUM_WAIT_EVENTS] = { 0, };
+	woodnet::TCPSocket* socket_ptr_table_[WSA_MAXIMUM_WAIT_EVENTS] = { nullptr, };
+	woodnet::TCPSocket* listen_ptr_ = nullptr;
 
-	char m_packet_rev_buf_[PACKET_SIZE_MAX] = { 0, };
-	std::string m_listen_ip = "0.0.0.0";
-	int m_listen_port;
+	char packet_rev_buf_[PACKET_SIZE_MAX] = { 0, };
+	std::string listen_ip_ = "0.0.0.0";
+	int listen_port_;
 
-	// ToDO :: Game Server 와 포트 분리 필요
-	bool m_running = false;
+	ConnectionStatus connection_status_;
 
-	ConnectionStatus m_connection_status;
-
-	LobbyManager* lobby;
+	LobbyManager* lobby_;
 
 public:
-	std::vector<std::string> m_log_msg;
+	std::vector<std::string> log_msg;
 };
 
 template<typename T>
