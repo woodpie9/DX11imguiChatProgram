@@ -150,101 +150,21 @@ int main(int, char**)
 
 					if (ImGui::Button(u8"서버 시작"))
 					{
-						isConnect = true;
 						server->listen();
+						isConnect = true;
 					}
 				}
 				else if(isConnect)
 				{
 					ImGui::Button(u8"서버 작동중... 로그 확인");
+					// network loop
 					server->update();
-
 				}
 				else
 				{
 					ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
 				}
-				//		else if (isConnect && client->get_connection_status() == ConnectionStatus::Connected)
-				//		{
-				//			ImGui::InputTextWithHint("Nickname", "enter text here", nickname, IM_ARRAYSIZE(nickname));
-
-				//			//ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
-				//			//ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
-				//			ImGui::SameLine();
-				//			if (ImGui::Button(u8"체팅방 입장"))
-				//			{
-				//				client->login_server();
-				//				client->m_log_msg.push_back(nickname);
-				//				client->m_log_msg.push_back(password);
-				//				client->set_nickname(nickname);
-				//			}
-
-				//			if (checkbox1)
-				//			{
-				//				ImGui::Text(password);
-				//			}
-
-				//			/*if (ImGui::Button(u8"접속 종료"))
-				//			{
-				//				isConnect = false;
-				//			}*/
-
-				//		}
-				//		else if (isConnect && client->get_connection_status() == ConnectionStatus::OnChat)
-				//		{
-				//			static int track_item;
-				//			static bool enable_track = true;
-				//			static bool enable_extra_decorations = false;
-
-				//			ImGui::Checkbox("Decoration", &enable_extra_decorations);
-				//			ImGui::SameLine();
-				//			ImGui::Checkbox("Track", &enable_track);
-				//			//ImGui::PushItemWidth(100);
-
-
-				//			ImGui::Text(u8"체팅 메시지 박스");
-
-
-				//			const ImGuiWindowFlags child_flags = enable_extra_decorations ? ImGuiWindowFlags_MenuBar : 0;
-				//			ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 20.0f), true, child_flags);
-				//			if (ImGui::BeginMenuBar())
-				//			{
-				//				ImGui::TextUnformatted(u8"체팅방 이름");
-				//				ImGui::EndMenuBar();
-				//			}
-				//			track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
-				//			for (int item = 0; item < client->m_vector_msg.size(); item++)
-				//			{
-				//				if (enable_track && item == track_item)
-				//				{
-				//					ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
-				//					ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
-				//				}
-				//				else
-				//				{
-				//					ImGui::Text(client->m_vector_msg[item].c_str());
-				//				}
-				//			}
-				//			ImGui::EndChild();
-
-
-				//			ImGui::InputTextWithHint(" ", "enter msg here", msgbox, IM_ARRAYSIZE(msgbox));
-				//			ImGui::SameLine();
-				//			if (ImGui::Button(u8"전송"))
-				//			{
-				//				client->send_chat_msg(msgbox);
-				//			}
-				//		}
-				//		else if( isConnect && client->get_connection_status()==ConnectionStatus::Connecting)
-				//		{
-				//			ImGui::Text(u8"연결중... 로그창 확인!!");
-				//		}
-				//		else
-				//		{
-				//			ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
-				//		}
-
-
+			
 			}
 			ImGui::End();
 		}

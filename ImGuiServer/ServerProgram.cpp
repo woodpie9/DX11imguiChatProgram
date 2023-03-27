@@ -26,6 +26,7 @@ void ServerProgram::init(int listemPort)
 	// 로비 매니저 생성
 	this->lobby = new LobbyManager();
 	set_m_connection_status(ConnectionStatus::Init);
+
 	m_log_msg.push_back("init :" + m_listen_ip + ":" + std::to_string(m_listen_port));
 
 }
@@ -75,6 +76,7 @@ bool ServerProgram::listen()
 		m_log_msg.emplace_back("fail listen");
 		return false;
 	}
+
 	m_log_msg.push_back("listen start :" + m_listen_ip + ":" + std::to_string(m_listen_port));
 
 	// Generator로 숫자를 증가시키자! 리슨은 0번. 숫자를 리턴하고 갯수를 증가시킨다.
@@ -107,6 +109,9 @@ bool ServerProgram::update()
 		m_log_msg.emplace_back("WSAWaitForMultipleEvents() failed");
 		return false;
 	}
+
+
+
 	//	else
 	//	CONSOLE_PRINT("WSAWaitForMultipleEvents() is pretty damn OK!\n");
 	//	WSAWaitForMultipleEvents 는 어떤 이벤트가 켜졌는지 알려줌.
@@ -119,12 +124,12 @@ bool ServerProgram::update()
 	{
 		//WSAEVENT hEvent = m_EventTable[socketIndex]; 와 pThisSocket->GetEventHandle(); 같은 넘
 		//WSAEventSelect 로 소켓과 이벤트 객체를 관련. 구체적으로 어떤 네트워크 이벤트인지 검색
-		m_log_msg.push_back("Current Socket is" + std::to_string(static_cast<int>(pThisSocket->GetNetID())));
+		m_log_msg.push_back("Current Socket is" + std::to_string(pThisSocket->GetNetID()));
 
 		WSANETWORKEVENTS NetworkEvents;
 		if (WSAEnumNetworkEvents(pThisSocket->GetHandle(), pThisSocket->GetEventHandle(), &NetworkEvents) == SOCKET_ERROR)
 		{
-			m_log_msg.push_back("WSAEnumNetworkEvents() failed with error" + std::to_string(WSAGetLastError()));
+			m_log_msg.push_back("1 WSAEnumNetworkEvents() failed with error" + std::to_string(WSAGetLastError()));
 			return false;
 		}
 		//	else
@@ -135,7 +140,7 @@ bool ServerProgram::update()
 		{
 			if (NetworkEvents.iErrorCode[FD_ACCEPT_BIT] != 0)
 			{
-				m_log_msg.push_back("WSAEnumNetworkEvents() failed with error" + std::to_string(WSAGetLastError()));
+				m_log_msg.push_back("2 WSAEnumNetworkEvents() failed with error" + std::to_string(WSAGetLastError()));
 				return false;
 			}
 			on_net_accept(pThisSocket);

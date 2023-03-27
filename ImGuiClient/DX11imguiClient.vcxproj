@@ -147,7 +147,7 @@
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp" />
     <ClCompile Include="ClientProgram.cpp" />
     <ClCompile Include="dx11Imgui.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ClientMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ImGui\imconfig.h" />
