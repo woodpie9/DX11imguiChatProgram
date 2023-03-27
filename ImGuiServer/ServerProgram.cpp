@@ -110,7 +110,12 @@ bool ServerProgram::update()
 		return false;
 	}
 
-
+	if (socketIndex == WSA_WAIT_TIMEOUT) // 258 이면...
+	{
+		// index가 258일때 pthisSocket이 null이 안드는 경우가 발생함... 뭐냐?
+		// 
+		return true;
+	}
 
 	//	else
 	//	CONSOLE_PRINT("WSAWaitForMultipleEvents() is pretty damn OK!\n");
