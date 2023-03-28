@@ -21,8 +21,8 @@ public:
 	UDPSocket();
 	~UDPSocket();
 
-	int		RecvFrom(char* pInBuf, int nLen, int& error, SOCKADDR_IN& remoteAddr, LPWSAOVERLAPPED pOv = NULL);
-	int		SendTo(char* pOutBuf, int nLen, int& error, SOCKADDR_IN& remoteAddr, LPWSAOVERLAPPED pOv = NULL);
+	int		RecvFrom(char* in_buf, int len, int& error, SOCKADDR_IN& remote_addr, LPWSAOVERLAPPED ov = NULL);
+	int		SendTo(char* out_buf, int len, int& error, SOCKADDR_IN& remote_addr, LPWSAOVERLAPPED ov = NULL);
 
 
 };

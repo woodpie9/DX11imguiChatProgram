@@ -2,6 +2,7 @@
 #include "CommonDefines.h"
 #include <cstdlib>					// C 표준 유틸리티 함수들을 모아놓은 해더파일
 
+// 202328 코드 스타일 변경
 // 202310 코드에 주석 작성 완료
 // 230309 woodpie9 코드 생성
 // TCP 네트워크 데이터는 바이트스트림으로 다룬다.
@@ -17,36 +18,35 @@ public:
 	StreamQueue(const StreamQueue&) = delete;
 	StreamQueue& operator=(const StreamQueue&) = delete;		// 복사생성자 삭제
 
-	StreamQueue(const int size)
+	StreamQueue(const int size) : queue_size_(size)
 	{
-		m_size = size;
-		m_buffer = static_cast<char*>(malloc(size));
-		clear();
+		buffer_ = static_cast<char*>(malloc(size));
+		Clear();
 	}
 	~StreamQueue()
 	{
-		free(m_buffer);
+		free(buffer_);
 	}
 
-	void clear();
+	void Clear();
 
-	bool is_empty() const;
-	bool is_full() const;
+	bool IsEmpty() const;
+	bool IsFull() const;
 
-	int remain() const;
-	int size() const;
-	int count() const;
+	int Remain() const;
+	int Size() const;
+	int Count() const;
 
-	bool peek(char* peekBuf, int peekLen) const;
-	int read(char* desBuf, int bufLen);
-	int write(const char* srcData, int bytesData);
+	bool Peek(char* peek_buf, int peek_len) const;
+	int Read(char* des_buf, int buf_len);
+	int Write(const char* src_data, int bytes_data);
 
 private:
-	short m_size;					// 환영 큐의 크기
-	short m_dataCount;			// 큐에 있는 데이터의 갯수
-	short m_readIndex;			// 읽을 데이터가 있는 위치
-	short m_writeIndex;			// 데이터를 쓸 수있는 위치
-	char* m_buffer;				// 데이터의 배열의 포인터
+	short queue_size_;			// 환영 큐의 크기
+	short data_count_;			// 큐에 있는 데이터의 갯수
+	short read_index_;			// 읽을 데이터가 있는 위치
+	short write_index_;			// 데이터를 쓸 수있는 위치
+	char* buffer_;				// 데이터의 배열의 포인터
 
 };
 

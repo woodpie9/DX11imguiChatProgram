@@ -1,16 +1,16 @@
 #include "UDPSocket.h"
 
-int woodnet::UDPSocket::RecvFrom(char* pInBuf, int nLen, int& error, SOCKADDR_IN& remoteAddr, LPWSAOVERLAPPED pOv)
+int woodnet::UDPSocket::RecvFrom(char* in_buf, int len, int& error, SOCKADDR_IN& remote_addr, LPWSAOVERLAPPED ov)
 {
 	WSABUF	wsabuf;
-	wsabuf.buf = pInBuf;
-	wsabuf.len = nLen;
+	wsabuf.buf = in_buf;
+	wsabuf.len = len;
 
 	DWORD nRecv = 0, flag = 0;
 
-	int	iAddrLen = sizeof(remoteAddr);
+	int	iAddrLen = sizeof(remote_addr);
 
-	if (WSARecvFrom(m_socket_, &wsabuf, 1, &nRecv, &flag, (SOCKADDR*)&remoteAddr, &iAddrLen, pOv, NULL) != SOCKET_ERROR)
+	if (WSARecvFrom(m_socket_, &wsabuf, 1, &nRecv, &flag, (SOCKADDR*)&remote_addr, &iAddrLen, ov, NULL) != SOCKET_ERROR)
 	{
 		return nRecv;
 	}
@@ -23,14 +23,14 @@ int woodnet::UDPSocket::RecvFrom(char* pInBuf, int nLen, int& error, SOCKADDR_IN
 	return -1;
 }
 
-int woodnet::UDPSocket::SendTo(char* pOutBuf, int nLen, int& error, SOCKADDR_IN& remoteAddr, LPWSAOVERLAPPED pOv)
+int woodnet::UDPSocket::SendTo(char* out_buf, int len, int& error, SOCKADDR_IN& remote_addr, LPWSAOVERLAPPED ov)
 {
 	WSABUF	wsabuf;
-	wsabuf.buf = pOutBuf;
-	wsabuf.len = nLen;
+	wsabuf.buf = out_buf;
+	wsabuf.len = len;
 
 	DWORD nSent = 0, flag = 0;
-	if (WSASendTo(m_socket_, &wsabuf, 1, &nSent, flag, (SOCKADDR*)&remoteAddr, sizeof(remoteAddr), pOv, NULL)!= SOCKET_ERROR)
+	if (WSASendTo(m_socket_, &wsabuf, 1, &nSent, flag, (SOCKADDR*)&remote_addr, sizeof(remote_addr), ov, NULL)!= SOCKET_ERROR)
 	{
 		return nSent;
 	}

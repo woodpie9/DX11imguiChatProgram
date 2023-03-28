@@ -4,6 +4,7 @@
 
 #include "CommonDefines.h"
 
+// 20230328 코드 스타일 변경
 // 20230317 코드 작성 완료
 // 20230313 woodpie9 코드 생성 헤더파일작성
 // TCP와 UDP의 공유부분을 묘사하는 클래스
@@ -12,7 +13,7 @@
 
 WOODNET_BEGIN
 
-struct SOCKET_INFO
+struct SocketInfo
 {
 	SOCKET s;
 	SOCKADDR_IN addr;

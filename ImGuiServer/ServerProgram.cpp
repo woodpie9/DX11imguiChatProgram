@@ -60,12 +60,12 @@ bool ServerProgram::listen()
 		return false;
 	}
 
-	SOCKADDR_IN ListenAddr;
-	ListenAddr.sin_family = AF_INET;
-	InetPtonA(AF_INET, listen_ip_.c_str(), &ListenAddr.sin_addr);
-	ListenAddr.sin_port = htons(listen_port_);
+	SOCKADDR_IN listen_addr;
+	listen_addr.sin_family = AF_INET;
+	InetPtonA(AF_INET, listen_ip_.c_str(), &listen_addr.sin_addr);
+	listen_addr.sin_port = htons(listen_port_);
 
-	if (listen_ptr_->Bind(ListenAddr) == false)
+	if (listen_ptr_->Bind(listen_addr) == false)
 	{
 		log_msg.emplace_back("fail bind for listen socket");
 		return false;
@@ -81,7 +81,7 @@ bool ServerProgram::listen()
 
 	// Generator로 숫자를 증가시키자! 리슨은 0번. 숫자를 리턴하고 갯수를 증가시킨다.
 	event_table_[socket_count_generator()] = listen_ptr_->GetEventHandle();
-	listen_ptr_->SetNetID(net_id_generator());
+	listen_ptr_->SetNetId(net_id_generator());
 
 	set_m_connection_status(ConnectionStatus::Listen);
 
@@ -104,7 +104,7 @@ bool ServerProgram::update()
 
 	int socketIndex = 0;
 	// 시간대기가 WSA_INFINITE 라서 나가는 클라 메시지가 안보내졌다. 시간은 CommonDefines 에서 정의.
-	if ((socketIndex = WSAWaitForMultipleEvents(socket_cnt_, event_table_, FALSE, DELEY_SERVER_ms, FALSE)) == WSA_WAIT_FAILED)
+	if ((socketIndex = WSAWaitForMultipleEvents(socket_cnt_, event_table_, FALSE, DELEY_SERVER_MS, FALSE)) == WSA_WAIT_FAILED)
 	{
 		log_msg.emplace_back("WSAWaitForMultipleEvents() failed");
 		return false;
@@ -129,7 +129,7 @@ bool ServerProgram::update()
 	{
 		//WSAEVENT hEvent = m_EventTable[socketIndex]; 와 pThisSocket->GetEventHandle(); 같은 넘
 		//WSAEventSelect 로 소켓과 이벤트 객체를 관련. 구체적으로 어떤 네트워크 이벤트인지 검색
-		log_msg.push_back("Current Socket is" + std::to_string(pThisSocket->GetNetID()));
+		log_msg.push_back("Current Socket is" + std::to_string(pThisSocket->GetNetId()));
 
 		WSANETWORKEVENTS NetworkEvents;
 		if (WSAEnumNetworkEvents(pThisSocket->GetHandle(), pThisSocket->GetEventHandle(), &NetworkEvents) == SOCKET_ERROR)
@@ -199,7 +199,7 @@ bool ServerProgram::update()
 		if (socket_ptr_table_[i]->SendUpdate() == false)
 		{
 			// 특정 소켓에서 실패함
-			log_msg.push_back("FD_READ failed with error " + std::to_string(static_cast<int>(socket_ptr_table_[i]->GetNetID())));
+			log_msg.push_back("FD_READ failed with error " + std::to_string(static_cast<int>(socket_ptr_table_[i]->GetNetId())));
 		}
 	}
 
@@ -219,7 +219,7 @@ bool ServerProgram::send(NetworkObjectID NetworkID, void* pPacket, int PacketLen
 	for (int i = 1; i < socket_cnt_; i++)
 	{
 		// 보내려는 소켓의 ID과 같은 소켓에만 패킷을 Post 한다.
-		if (socket_ptr_table_[i]->GetNetID() == NetworkID)
+		if (socket_ptr_table_[i]->GetNetId() == NetworkID)
 		{
 			return socket_ptr_table_[i]->PostPacket(static_cast<char*>(pPacket), PacketLen);
 		}
@@ -272,7 +272,7 @@ void ServerProgram::on_net_accept(woodnet::TCPSocket* pThisSocket)
 	woodnet::TCPSocket* pNewSocket = socket_ptr_table_[socket_count_generator()];
 	//pNewSocket 재사용하는 경우를 고려하면 클리어를 마저 구현해야 함
 	pNewSocket->Attach(newClientSocket);
-	pNewSocket->SetNetID(net_id_generator());
+	pNewSocket->SetNetId(net_id_generator());
 
 
 	if (false == pNewSocket->EventSelect(FD_READ | FD_WRITE | FD_CLOSE))
@@ -285,11 +285,11 @@ void ServerProgram::on_net_accept(woodnet::TCPSocket* pThisSocket)
 	// EventSelect를 해야 이벤트가 생성 됨
 	event_table_[socket_cnt_ - 1] = pNewSocket->GetEventHandle();
 	log_msg.emplace_back("WSAEventSelect() is OK!");
-	log_msg.emplace_back("Socket got connected..." + std::to_string((int)pNewSocket->GetNetID()));
+	log_msg.emplace_back("Socket got connected..." + std::to_string((int)pNewSocket->GetNetId()));
 
 
 	// 로비 매니저에게 정보를 넘겨서 플레이어 객체를 만들고
-	this->lobby_->new_player(pNewSocket->GetNetID());
+	this->lobby_->new_player(pNewSocket->GetNetId());
 
 	// 패킷을 만들어서 클라에게 접속이 완료되었다고 알린다.
 	MSG_S2C_ACCEPT S2CSendPacket;
@@ -297,11 +297,11 @@ void ServerProgram::on_net_accept(woodnet::TCPSocket* pThisSocket)
 	S2CSendPacket.packet_size = sizeof(MSG_S2C_ACCEPT);
 	S2CSendPacket.packet_id = static_cast<INT16>(COMMON_PAKET_ID::S2C_ACCEPT);
 	S2CSendPacket.seqNum = 0;
-	S2CSendPacket.NetID = pNewSocket->GetNetID();
+	S2CSendPacket.NetID = pNewSocket->GetNetId();
 
-	if (send(pNewSocket->GetNetID(), &S2CSendPacket, S2CSendPacket.packet_size) == false)
+	if (send(pNewSocket->GetNetId(), &S2CSendPacket, S2CSendPacket.packet_size) == false)
 	{
-		log_msg.push_back("LobbyServer.Send fail... ID : " + std::to_string(pNewSocket->GetNetID()));
+		log_msg.push_back("LobbyServer.Send fail... ID : " + std::to_string(pNewSocket->GetNetId()));
 	}
 }
 
@@ -315,9 +315,9 @@ void ServerProgram::on_net_close(woodnet::TCPSocket* pThisSocket, int socketInde
 	S2CBroadCasePacket.packet_size = sizeof(MSG_S2C_LEAVE_PLAYER);
 	S2CBroadCasePacket.packet_id = static_cast<INT16>(LOBBY_PACKET_ID::S2C_LEAVE_PLAYER);
 	S2CBroadCasePacket.seqNum = 0;
-	S2CBroadCasePacket.NetID = pThisSocket->GetNetID();
+	S2CBroadCasePacket.NetID = pThisSocket->GetNetId();
 
-	std::string str = this->lobby_->get_nick_name(pThisSocket->GetNetID());
+	std::string str = this->lobby_->get_nick_name(pThisSocket->GetNetId());
 	const char* cstr = str.c_str();
 	char* name = const_cast<char*>(cstr);
 
@@ -325,14 +325,14 @@ void ServerProgram::on_net_close(woodnet::TCPSocket* pThisSocket, int socketInde
 
 	if (broadcast(&S2CBroadCasePacket, S2CBroadCasePacket.packet_size) == false)
 	{
-		log_msg.push_back("LobbyServer.Broadcast fail ID : " + std::to_string(pThisSocket->GetNetID()));
+		log_msg.push_back("LobbyServer.Broadcast fail ID : " + std::to_string(pThisSocket->GetNetId()));
 		return;
 	}
 
 
 	// LobbyManager에서도 지운다.
 	// 클라가 정상 종료이면 이미 없어져있겠지만 그래도 한번 더 확인한다.
-	this->lobby_->delete_player(pThisSocket->GetNetID());
+	this->lobby_->delete_player(pThisSocket->GetNetId());
 
 	// 삭제했음을 알린다.
 	MSG_S2C_LEAVE_LOBBY_OK S2CSendPacket;
@@ -341,14 +341,14 @@ void ServerProgram::on_net_close(woodnet::TCPSocket* pThisSocket, int socketInde
 	S2CSendPacket.packet_id = static_cast<INT16>(LOBBY_PACKET_ID::S2C_LEAVE_LOBBY_OK);
 	S2CSendPacket.seqNum = 0;
 
-	if (send(pThisSocket->GetNetID(), &S2CSendPacket, S2CSendPacket.packet_size) == false)
+	if (send(pThisSocket->GetNetId(), &S2CSendPacket, S2CSendPacket.packet_size) == false)
 	{
-		log_msg.push_back("LobbyServer.Send fail ID : " + std::to_string(pThisSocket->GetNetID()));
+		log_msg.push_back("LobbyServer.Send fail ID : " + std::to_string(pThisSocket->GetNetId()));
 	}
 
 
 	// SocketCnt바꾸기, SocketPtr 변경. (가장 뒤에 있는 클라를 구멍난 곳으로 옮기기)
-	log_msg.push_back("Soccket FD_CLOSE! ID : " + std::to_string(pThisSocket->GetNetID()));
+	log_msg.push_back("Soccket FD_CLOSE! ID : " + std::to_string(pThisSocket->GetNetId()));
 
 	int CloseSocIndex = socketIndex;
 	int LastSocNetID = socket_cnt_ - 1;
@@ -390,7 +390,7 @@ void ServerProgram::on_net_receive(woodnet::TCPSocket* pThisSocket)
 		{
 			char ipport[IPPORT_LEN];
 			get_client_IPPort(pThisSocket->GetHandle(), ipport);
-			log_msg.push_back("ID : " + std::to_string(pThisSocket->GetNetID()) + " client Seq :: " + std::to_string(msgHeader.seqNum));
+			log_msg.push_back("ID : " + std::to_string(pThisSocket->GetNetId()) + " client Seq :: " + std::to_string(msgHeader.seqNum));
 
 			packet_dispatcher(pThisSocket, packet_rev_buf_, msgHeader.packet_size);
 		}
@@ -448,7 +448,7 @@ void ServerProgram::packet_dispatcher(woodnet::TCPSocket* pRecvSocket, void* pPa
 {
 	// 패킷을 보낸 클라이언트의 생존신고
 
-	this->lobby_->heart_beat(pRecvSocket->GetNetID());
+	this->lobby_->heart_beat(pRecvSocket->GetNetId());
 
 	auto* pHeader = static_cast<PACKET_HEADER*>(pPacket);
 
@@ -456,37 +456,37 @@ void ServerProgram::packet_dispatcher(woodnet::TCPSocket* pRecvSocket, void* pPa
 	{
 		case static_cast<INT16>(COMMON_PAKET_ID::C2S_HEART_BEAT):
 		{
-			on_packet_proc_heart_beat(pRecvSocket->GetNetID());
+			on_packet_proc_heart_beat(pRecvSocket->GetNetId());
 		}
 		break;
 
 		case static_cast<INT16>(LOBBY_PACKET_ID::C2S_ENTER_LOBBY):
 		{
-			on_packet_proc_enter_lobby(pRecvSocket->GetNetID());
+			on_packet_proc_enter_lobby(pRecvSocket->GetNetId());
 		}
 		break;
 
 		case static_cast<INT16>(LOBBY_PACKET_ID::C2S_LEAVE_LOBBY):
 		{
-			on_packet_proc_leave_lobby(pRecvSocket->GetNetID());
+			on_packet_proc_leave_lobby(pRecvSocket->GetNetId());
 		}
 		break;
 
 		case static_cast<INT16>(LOBBY_PACKET_ID::C2S_ENTER_CHAT_SER):
 		{
-			on_packet_proc_enter_chat_ser(pRecvSocket->GetNetID(), pPacket, len);
+			on_packet_proc_enter_chat_ser(pRecvSocket->GetNetId(), pPacket, len);
 		}
 		break;
 
 		case static_cast<INT16>(LOBBY_PACKET_ID::C2S_CHANGE_NAME):
 		{
-			on_packet_proc_change_name(pRecvSocket->GetNetID(), pPacket, len);
+			on_packet_proc_change_name(pRecvSocket->GetNetId(), pPacket, len);
 		}
 		break;
 
 		case static_cast<INT16>(LOBBY_PACKET_ID::C2S_CHAT):
 		{
-			on_packet_proc_chat(pRecvSocket->GetNetID(), pPacket, len);
+			on_packet_proc_chat(pRecvSocket->GetNetId(), pPacket, len);
 		}
 		break;
 
