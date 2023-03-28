@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\DxGuiBase\dx11Imgui.cpp" />
     <ClCompile Include="..\ImGui\imgui.cpp" />
     <ClCompile Include="..\ImGui\imgui_demo.cpp" />
     <ClCompile Include="..\ImGui\imgui_draw.cpp" />
@@ -146,10 +147,10 @@
     <ClCompile Include="..\WoodnetBase\WinNetwork.cpp" />
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp" />
     <ClCompile Include="ClientProgram.cpp" />
-    <ClCompile Include="dx11Imgui.cpp" />
     <ClCompile Include="ClientMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\DxGuiBase\dx11Imgui.h" />
     <ClInclude Include="..\ImGui\imconfig.h" />
     <ClInclude Include="..\ImGui\imgui.h" />
     <ClInclude Include="..\ImGui\imgui_impl_dx11.h" />
@@ -166,7 +167,6 @@
     <ClInclude Include="..\WoodnetBase\WinSocket.h" />
     <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h" />
     <ClInclude Include="ClientProgram.h" />
-    <ClInclude Include="dx11Imgui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

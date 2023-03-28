@@ -15,6 +15,9 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{2a527b5e-efec-4b30-9350-b0cf84530b03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DxGuiBase">
+      <UniqueIdentifier>{bfd40e92-b856-4d8d-b499-8286f0ee857a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClientMain.cpp">
@@ -38,9 +41,6 @@
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp">
       <Filter>WoodnetBase</Filter>
     </ClCompile>
-    <ClCompile Include="dx11Imgui.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\ImGui\imgui.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
@@ -61,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="..\ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DxGuiBase\dx11Imgui.cpp">
+      <Filter>DxGuiBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +91,6 @@
     <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h">
       <Filter>WoodnetBase</Filter>
     </ClInclude>
-    <ClInclude Include="dx11Imgui.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="..\ImGui\imconfig.h">
       <Filter>ImGui</Filter>
     </ClInclude>
@@ -114,6 +114,9 @@
     </ClInclude>
     <ClInclude Include="..\ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DxGuiBase\dx11Imgui.h">
+      <Filter>DxGuiBase</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 // Client
 #include "../woodnetBase/WinNetwork.h"
 #include "ClientProgram.h"
-#include "dx11Imgui.h"
+#include "../DxGuiBase/dx11Imgui.h"
 
 woodnet::WinNetwork* network;
 ClientProgram* client;

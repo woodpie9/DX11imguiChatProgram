@@ -19,6 +19,9 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{d92c0241-43a2-4782-ba30-631158ef3a82}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DxGuiBase">
+      <UniqueIdentifier>{be1f6ff0-6139-4718-bc5a-08934b3d88e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ImGui\imconfig.h">
@@ -66,14 +69,14 @@
     <ClInclude Include="..\WoodnetBase\WoodnetProtocol.h">
       <Filter>WoodnetBase</Filter>
     </ClInclude>
-    <ClInclude Include="dx11Imgui.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ServerProgram.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="LobbyManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DxGuiBase\dx11Imgui.h">
+      <Filter>DxGuiBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -113,9 +116,6 @@
     <ClCompile Include="..\WoodnetBase\WinSocket.cpp">
       <Filter>WoodnetBase</Filter>
     </ClCompile>
-    <ClCompile Include="dx11Imgui.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ServerMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -124,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="LobbyManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DxGuiBase\dx11Imgui.cpp">
+      <Filter>DxGuiBase</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
