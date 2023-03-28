@@ -28,16 +28,16 @@ public:
 	ServerProgram();
 	~ServerProgram();
 
-	void init(int listemPort = 5252);	// 소켓을 생성하고 리슨 포트를 지정합니다.
-	void clean_up();					// 모든 소켓을 반납합니다.
+	void Init(int listem_port = 5252);	// 소켓을 생성하고 리슨 포트를 지정합니다.
+	void CleanUp();					// 모든 소켓을 반납합니다.
 
-	bool listen();
-	bool update();
-	//bool close();
+	bool Listen();
+	bool Update();
+	//bool Close();
 
 
 
-	ConnectionStatus get_m_connection_status() const
+	ConnectionStatus GetConnectionStatus() const
 	{
 		return connection_status_;
 	}
@@ -46,34 +46,34 @@ public:
 private:
 	// 패킷 헤더에 유효한 값이 있다고 전재한다.
 	// 특정 유저에게 패킷을 보낸다.
-	bool send(NetworkObjectID NetworkID, void* pPacket, int PacketLen);
+	bool Send(NetworkObjectID network_id, void* packet, int packet_len);
 	// 접속한 모든 유저에게 패킷을 보낸다.
-	bool broadcast(void* pPacket, int PacketLen);
+	bool Broadcast(void* packet, int packet_len);
 
-	void set_m_connection_status(ConnectionStatus m_connection_status)
+	void SetConnectionStatus(ConnectionStatus connection_status)
 	{
-		this->connection_status_ = m_connection_status;
+		this->connection_status_ = connection_status;
 	}
 
-	void on_net_accept(woodnet::TCPSocket* pThisSocket);
-	void on_net_close(woodnet::TCPSocket* pThisSocket, int socketIndex);
-	void on_net_receive(woodnet::TCPSocket* pThisSocket);
-	void on_net_send(woodnet::TCPSocket* pThisSocket);
+	void OnNetAccept(woodnet::TCPSocket* this_socket);
+	void OnNetClose(woodnet::TCPSocket* this_socket, int socket_index);
+	void OnNetReceive(woodnet::TCPSocket* this_socket);
+	void OnNetSend(woodnet::TCPSocket* this_socket);
 
-	void get_client_IPPort(SOCKET ClientSocket, char* ipPort);
+	void GetClientIpPort(SOCKET client_socket, char* ip_port);
 
-	NetworkObjectID net_id_generator() { return net_id_++; };
-	int socket_count_generator() { return socket_cnt_++; };
+	NetworkObjectID NetIdGenerator() { return net_id_++; };
+	int SocketCountGenerator() { return socket_cnt_++; };
 
 private:
-	void packet_dispatcher(woodnet::TCPSocket* pRecvSocket, void* pPacket, int len);
+	void PacketDispatcher(woodnet::TCPSocket* recv_socket, void* packet, int len);
 
-	void on_packet_proc_heart_beat(NetworkObjectID NetID) const;
-	void on_packet_proc_enter_lobby(NetworkObjectID NetId);
-	void on_packet_proc_leave_lobby(NetworkObjectID NetId);
-	void on_packet_proc_enter_chat_ser(NetworkObjectID NetId, void* pC2SPacket, int C2SPacketLen);
-	void on_packet_proc_change_name(NetworkObjectID NetId, void* pC2SPacket, int C2SPacketLen);
-	void on_packet_proc_chat(NetworkObjectID NetId, void* pC2SPacket, int C2SPacketLen);
+	void OnPacketProcessHeartBeat(NetworkObjectID net_id) const;
+	void OnPacketProcessEnterLobby(NetworkObjectID net_id);
+	void OnPacketProcessLeaveLobby(NetworkObjectID net_id);
+	void OnPacketProcessEnterChatSer(NetworkObjectID net_id, void* C2S_packet, int C2S_packet_len);
+	void OnPacketProcessChangeName(NetworkObjectID net_id, void* C2S_packet, int C2S_packet_len);
+	void OnPacketProcessChat(NetworkObjectID net_id, void* C2S_packet, int C2S_packet_len);
 
 
 private:
@@ -92,7 +92,7 @@ private:
 	LobbyManager* lobby_;
 
 public:
-	std::vector<std::string> log_msg;
+	std::vector<std::string> log_msg_;
 };
 
 template<typename T>

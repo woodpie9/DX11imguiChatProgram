@@ -7,6 +7,7 @@
 #include <tchar.h>
 
 
+// 20230323 main 에서 dx11과 imgui 기본 분리 작업
 class dx11Imgui
 {
 public:
