@@ -31,7 +31,7 @@ int main(int, char**)
 
 	// winsock2 사용 시작
 	network->Init();
-	client->init();
+	client->Init();
 	dx11_gui->init();
 
 	bool isConnect = false;
@@ -112,17 +112,17 @@ int main(int, char**)
 				ImGui::EndMenuBar();
 				}
 
-				const int track_item = static_cast<int>(client->m_log_msg.size()) - 1;
-				for (int item = 0; item < client->m_log_msg.size(); item++)
+				const int track_item = static_cast<int>(client->log_msg_.size()) - 1;
+				for (int item = 0; item < client->log_msg_.size(); item++)
 				{
 					if (item == track_item)
 					{
-						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_log_msg[item].c_str());
+						ImGui::TextColored(ImVec4(1, 1, 0, 1), client->log_msg_[item].c_str());
 						ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
 					}
 					else
 					{
-						ImGui::Text(client->m_log_msg[item].c_str());
+						ImGui::Text(client->log_msg_[item].c_str());
 					}
 				}
 
@@ -140,7 +140,7 @@ int main(int, char**)
 			if (isConnect == true)
 			{
 				// client network loop
-				client->network_update();
+				client->NetworkUpdate();
 			}
 
 			ImGui::SetNextWindowPos(ImVec2(600, 30));
@@ -157,8 +157,8 @@ int main(int, char**)
 					if (ImGui::Button(u8"서버 접속"))
 					{
 						isConnect = true;
-						client->m_log_msg.push_back(const_cast<char*>(IPlist[IP_current]));
-						client->connect_server(IPlist[IP_current]);
+						client->log_msg_.push_back(const_cast<char*>(IPlist[IP_current]));
+						client->ConnectServer(IPlist[IP_current]);
 					}
 				}
 				else if (isConnect && client->get_connection_status() == ConnectionStatus::Connected)
@@ -170,10 +170,10 @@ int main(int, char**)
 					ImGui::SameLine();
 					if (ImGui::Button(u8"체팅방 입장"))
 					{
-						client->login_server();
-						client->m_log_msg.push_back(nickname);
-						client->m_log_msg.push_back(password);
-						client->set_nickname(nickname);
+						client->LoginServer();
+						client->log_msg_.push_back(nickname);
+						client->log_msg_.push_back(password);
+						client->SetNickname(nickname);
 					}
 
 					if (checkbox1)
@@ -209,17 +209,17 @@ int main(int, char**)
 						ImGui::TextUnformatted(u8"체팅방 이름");
 						ImGui::EndMenuBar();
 					}
-					track_item = static_cast<int>(client->m_vector_msg.size()) - 1;
-					for (int item = 0; item < client->m_vector_msg.size(); item++)
+					track_item = static_cast<int>(client->vector_msg_.size()) - 1;
+					for (int item = 0; item < client->vector_msg_.size(); item++)
 					{
 						if (enable_track && item == track_item)
 						{
-							ImGui::TextColored(ImVec4(1, 1, 0, 1), client->m_vector_msg[item].c_str());
+							ImGui::TextColored(ImVec4(1, 1, 0, 1), client->vector_msg_[item].c_str());
 							ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
 						}
 						else
 						{
-							ImGui::Text(client->m_vector_msg[item].c_str());
+							ImGui::Text(client->vector_msg_[item].c_str());
 						}
 					}
 					ImGui::EndChild();
@@ -229,7 +229,7 @@ int main(int, char**)
 					ImGui::SameLine();
 					if (ImGui::Button(u8"전송"))
 					{
-						client->send_chat_msg(msgbox);
+						client->SendChatMsg(msgbox);
 					}
 				}
 				else if( isConnect && client->get_connection_status()==ConnectionStatus::Connecting)
