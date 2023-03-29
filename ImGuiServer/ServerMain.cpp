@@ -12,6 +12,9 @@ woodnet::WinNetwork* network;
 ServerProgram* server;
 dx11Imgui* dx11_gui;
 
+static const char* connection_status_str[] = { "None",	"Oppend",	"SetEvent",	"Connecting",	"Connected",	"OnChat",	"Disconnected",	"Closed" };
+
+
 // Main code
 int main(int, char**)
 {
@@ -63,8 +66,8 @@ int main(int, char**)
 		{
 			static float f = 0.0f;
 			static int counter = 0;
+			ImGui::SetNextWindowPos(ImVec2(30, 30), ImGuiCond_Once);
 			ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
-			ImGui::SetNextWindowPos(ImVec2(30, 30));
 			ImGui::Begin(u8"Hello, world! 한글도 출력");             // Create a window called "Hello, world!" and append into it.
 
 			// 한글 출력
@@ -88,14 +91,73 @@ int main(int, char**)
 		}
 
 
-		if (show_logger_window)
+		//if (show_logger_window)
+		//{
+		//	// log
+		//	ImGui::SetNextWindowPos(ImVec2(30, 350), ImGuiCond_Once);
+		//	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Always);
+		//	ImGui::Begin("logger");
+		//	{
+		//		ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true);
+
+		//		if (ImGui::BeginMenuBar())
+		//		{
+		//			ImGui::TextUnformatted(u8"Logger");
+		//			ImGui::EndMenuBar();
+		//		}
+
+		//		const int track_item = static_cast<int>(server->log_msg_.size()) - 1;
+		//		for (int item = 0; item < server->log_msg_.size(); item++)
+		//		{
+		//			if (item == track_item)
+		//			{
+		//				ImGui::TextColored(ImVec4(1, 1, 0, 1), server->log_msg_[item].c_str());
+		//				ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
+		//			}
+		//			else
+		//			{
+		//				ImGui::Text(server->log_msg_[item].c_str());
+		//			}
+		//		}
+
+		//		ImGui::EndChild();
+
+
+		//		ConnectionStatus connection =  server->GetConnectionStatus();
+		//		ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
+
+		//	}
+		//	ImGui::End();
+		//}
+
+
+		if (show_chatting_server)
 		{
-			// log
-			ImGui::SetNextWindowPos(ImVec2(30, 350));
-			ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Always);
-			ImGui::Begin("logger");
+			ImGui::SetNextWindowPos(ImVec2(600, 30), ImGuiCond_Once);
+			ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_Always);
+			ImGui::Begin("Chatting Client");
 			{
-				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true);
+				if (!isConnect)
+				{
+					if (ImGui::Button(u8"서버 시작"))
+					{
+						server->Listen();
+						isConnect = true;
+					}
+				}
+				else if(isConnect)
+				{
+					ImGui::Button(u8"서버 작동중... 로그 확인");
+					// network loop
+					server->Update();
+				}
+				else
+				{
+					ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
+				}
+
+				ImGui::NewLine();
+				ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 15.0f), true);
 
 				if (ImGui::BeginMenuBar())
 				{
@@ -118,35 +180,9 @@ int main(int, char**)
 				}
 
 				ImGui::EndChild();
-			}
-			ImGui::End();
-		}
-
-
-		if (show_chatting_server)
-		{
-			ImGui::SetNextWindowPos(ImVec2(600, 30));
-			ImGui::SetNextWindowSize(ImVec2(500, 300), ImGuiCond_Always);
-			ImGui::Begin("Chatting Client");
-			{
-				if (!isConnect)
-				{
-					if (ImGui::Button(u8"서버 시작"))
-					{
-						server->Listen();
-						isConnect = true;
-					}
-				}
-				else if(isConnect)
-				{
-					ImGui::Button(u8"서버 작동중... 로그 확인");
-					// network loop
-					server->Update();
-				}
-				else
-				{
-					ImGui::Text(u8"여긴 누구 나는 어디... 로그창 확인!!");
-				}
+				
+				ConnectionStatus connection = server->GetConnectionStatus();
+				ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
 			
 			}
 			ImGui::End();
