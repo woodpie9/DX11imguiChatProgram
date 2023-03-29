@@ -11,32 +11,32 @@ LobbyManager::~LobbyManager()
 	m_players_info.clear();
 }
 
-void LobbyManager::update()
+void LobbyManager::Update()
 {
 	for (auto player : m_players_info)
 	{
-		player.life_timer++;
+		player.life_timer_++;
 	}
 }
 
-void LobbyManager::new_player(NetworkObjectID NetID)
+void LobbyManager::NewPlayer(NetworkObjectID net_id)
 {
 	// 새로운 플레이어의 정보를 담을 구조체를 만들어서 벡터에 넣는다.
 	PlayerInfo newPlayer;
 
-	newPlayer.set_state(LobbyPlayerState::Accept);
-	newPlayer.set_net_id(NetID);
-	newPlayer.set_nick_name("");
-	newPlayer.life_timer = 0;
+	newPlayer.SetState(LobbyPlayerState::Accept);
+	newPlayer.SetNetId(net_id);
+	newPlayer.SetNickName("");
+	newPlayer.life_timer_ = 0;
 
 	m_players_info.push_back(newPlayer);
 }
 
-void LobbyManager::delete_player(NetworkObjectID NetID)
+void LobbyManager::DeletePlayer(NetworkObjectID net_id)
 {
 	for (int i = 0; i < m_players_info.size(); i++)
 	{
-		if (m_players_info[i].get_net_id() == NetID)
+		if (m_players_info[i].GetNetId() == net_id)
 		{
 			m_players_info.erase(m_players_info.begin() + i);
 			return;
@@ -44,25 +44,25 @@ void LobbyManager::delete_player(NetworkObjectID NetID)
 	}
 }
 
-bool LobbyManager::set_player_state(NetworkObjectID NetID, LobbyPlayerState State)
+bool LobbyManager::SetPlayerState(NetworkObjectID net_id, LobbyPlayerState state)
 {
 	for (auto player : m_players_info)
 	{
-		if (player.get_net_id() == NetID)
+		if (player.GetNetId() == net_id)
 		{
-			player.set_state(State);
+			player.SetState(state);
 			return true;
 		}
 	}
 }
 
-bool LobbyManager::set_player_nick_name(NetworkObjectID NetID, char* name)
+bool LobbyManager::SetPlayerNickName(NetworkObjectID net_id, char* name)
 {
 	for (int i = 0; i < m_players_info.size(); i++)
 	{
-		if (m_players_info[i].get_net_id() == NetID)
+		if (m_players_info[i].GetNetId() == net_id)
 		{
-			m_players_info[i].set_nick_name(name);
+			m_players_info[i].SetNickName(name);
 
 			return true;
 		}
@@ -71,45 +71,45 @@ bool LobbyManager::set_player_nick_name(NetworkObjectID NetID, char* name)
 	return false;
 }
 
-void LobbyManager::heart_beat(NetworkObjectID NetID)
+void LobbyManager::HeartBeat(NetworkObjectID net_id)
 {
 	for (int i = 0; i < m_players_info.size(); i++)
 	{
-		if (m_players_info[i].get_net_id() == NetID)
+		if (m_players_info[i].GetNetId() == net_id)
 		{
-			m_players_info[i].life_timer = 0;
+			m_players_info[i].life_timer_ = 0;
 			return;
 		}
 	}
 }
 
-LobbyPlayerState LobbyManager::get_player_state(NetworkObjectID NetID)
+LobbyPlayerState LobbyManager::GetPlayerState(NetworkObjectID net_id)
 {
 	for (const auto player : m_players_info)
 	{
-		if (player.get_net_id() == NetID)
+		if (player.GetNetId() == net_id)
 		{
-			return player.get_state();
+			return player.GetState();
 		}
 	}
 }
 
-std::string LobbyManager::get_nick_name(NetworkObjectID NetID)
+std::string LobbyManager::GetNickName(NetworkObjectID net_id)
 {
 	for (int i = 0; i < m_players_info.size(); i++)
 	{
-		if (m_players_info[i].get_net_id() == NetID)
+		if (m_players_info[i].GetNetId() == net_id)
 		{
-			return m_players_info[i].get_nick_name();
+			return m_players_info[i].GetNickName();
 		}
 	}
 }
 
-void LobbyManager::check_hear_beat(NetworkObjectID NetID)
+void LobbyManager::CheckHearBeat(NetworkObjectID net_id)
 {
 	for (const auto player : m_players_info)
 	{
-		if (player.life_timer > 10000000)
+		if (player.life_timer_ > 10000000)
 		{
 			// TODO : 일정 이상 응답이 새로 없으면 살아있는지 물어보자.
 		}
