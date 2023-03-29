@@ -26,9 +26,8 @@ void ServerProgram::Init(int listem_port)
 	// 로비 매니저 생성
 	this->lobby_ = new LobbyManager();
 	SetConnectionStatus(ConnectionStatus::Init);
-
+	
 	log_msg_.push_back("init :" + listen_ip_ + ":" + std::to_string(listen_port_));
-
 }
 
 void ServerProgram::CleanUp()
@@ -305,7 +304,7 @@ void ServerProgram::OnNetAccept(woodnet::TCPSocket* this_socket)
 
 
 	// 로비 매니저에게 정보를 넘겨서 플레이어 객체를 만들고
-	this->lobby_->new_player(new_socket->GetNetId());
+	this->lobby_->NewPlayer(new_socket->GetNetId());
 
 	// 패킷을 만들어서 클라에게 접속이 완료되었다고 알린다.
 	MSG_S2C_ACCEPT S2CSendPacket;
@@ -334,7 +333,7 @@ void ServerProgram::OnNetClose(woodnet::TCPSocket* this_socket, int socket_index
 	S2CBroadCasePacket.seqNum = 0;
 	S2CBroadCasePacket.NetID = this_socket->GetNetId();
 
-	std::string str = this->lobby_->get_nick_name(this_socket->GetNetId());
+	std::string str = this->lobby_->GetNickName(this_socket->GetNetId());
 	const char* cstr = str.c_str();
 	char* name = const_cast<char*>(cstr);
 
@@ -350,7 +349,7 @@ void ServerProgram::OnNetClose(woodnet::TCPSocket* this_socket, int socket_index
 
 	// LobbyManager에서도 지운다.
 	// 클라가 정상 종료이면 이미 없어져있겠지만 그래도 한번 더 확인한다.
-	this->lobby_->delete_player(this_socket->GetNetId());
+	this->lobby_->DeletePlayer(this_socket->GetNetId());
 
 	// 삭제했음을 알린다.
 	MSG_S2C_LEAVE_LOBBY_OK S2CSendPacket;
@@ -469,7 +468,7 @@ void ServerProgram::PacketDispatcher(woodnet::TCPSocket* recv_socket, void* pack
 {
 	// 패킷을 보낸 클라이언트의 생존신고
 
-	this->lobby_->heart_beat(recv_socket->GetNetId());
+	this->lobby_->HeartBeat(recv_socket->GetNetId());
 
 	auto* packet_header = static_cast<PACKET_HEADER*>(packet);
 
@@ -518,13 +517,13 @@ void ServerProgram::PacketDispatcher(woodnet::TCPSocket* recv_socket, void* pack
 
 void ServerProgram::OnPacketProcessHeartBeat(NetworkObjectID net_id) const
 {
-	this->lobby_->heart_beat(net_id);
+	this->lobby_->HeartBeat(net_id);
 }
 
 void ServerProgram::OnPacketProcessEnterLobby(NetworkObjectID net_id)
 {
 	// 로비의 플레이어 상태를 변경합니다.
-	this->lobby_->set_player_state(net_id, LobbyPlayerState::InLobby);
+	this->lobby_->SetPlayerState(net_id, LobbyPlayerState::InLobby);
 
 	// 클라에게 보낼 패킷 생성
 	MSG_S2C_ENTER_LOBBY_OK S2CSendPacket;
@@ -567,7 +566,7 @@ void ServerProgram::OnPacketProcessLeaveLobby(NetworkObjectID net_id)
 	S2CBroadCasePacket.NetID = net_id;
 
 
-	std::string string = this->lobby_->get_nick_name(net_id);
+	std::string string = this->lobby_->GetNickName(net_id);
 	const char* cstr = string.c_str();
 	char* name = const_cast<char*>(cstr);
 	memcpy(S2CBroadCasePacket.NickName, name, MAX_NICKNAME_LEN + 1);
@@ -579,7 +578,7 @@ void ServerProgram::OnPacketProcessLeaveLobby(NetworkObjectID net_id)
 	}
 
 	// 로비 메니저에서 삭제한다.
-	this->lobby_->delete_player(net_id);
+	this->lobby_->DeletePlayer(net_id);
 }
 
 void ServerProgram::OnPacketProcessEnterChatSer(NetworkObjectID net_id, void* C2S_packet, int C2S_packet_len)
@@ -596,9 +595,9 @@ void ServerProgram::OnPacketProcessEnterChatSer(NetworkObjectID net_id, void* C2
 	memcpy(name, C2SRcvPacket->NickName, sizeof(C2SRcvPacket->NickName));//MAX_NICKNAME_LEN + 1);
 
 
-	if (this->lobby_->set_player_nick_name(net_id, name))//name))
+	if (this->lobby_->SetPlayerNickName(net_id, name))//name))
 	{
-		this->lobby_->set_player_state(net_id, LobbyPlayerState::InChat);
+		this->lobby_->SetPlayerState(net_id, LobbyPlayerState::InChat);
 		S2CSendPacket.Result = true;
 
 		if (Send(net_id, &S2CSendPacket, S2CSendPacket.packet_size) == false)
@@ -615,7 +614,7 @@ void ServerProgram::OnPacketProcessEnterChatSer(NetworkObjectID net_id, void* C2
 		S2CBroadCasePacket.seqNum = 0;
 		S2CBroadCasePacket.NetID = net_id;
 
-		std::string str = this->lobby_->get_nick_name(net_id);
+		std::string str = this->lobby_->GetNickName(net_id);
 		const char* cstr = str.c_str();
 		char* name = const_cast<char*>(cstr);
 
@@ -646,9 +645,9 @@ void ServerProgram::OnPacketProcessChangeName(NetworkObjectID net_id, void* C2S_
 	memcpy(name, C2SRcvPacket->NickName, MAX_NICKNAME_LEN + 1);
 
 
-	if (this->lobby_->set_player_nick_name(net_id, name))
+	if (this->lobby_->SetPlayerNickName(net_id, name))
 	{
-		this->lobby_->set_player_state(net_id, LobbyPlayerState::InChat);
+		this->lobby_->SetPlayerState(net_id, LobbyPlayerState::InChat);
 
 		// 이름이 변경되었음을 전체에게 알린다.
 		MSG_S2C_CHANGE_NAME_OK S2CBroadCastPacket;
@@ -686,7 +685,7 @@ void ServerProgram::OnPacketProcessChat(NetworkObjectID net_id, void* C2S_packet
 	S2CBroadCasePacket.seqNum = 0;
 	S2CBroadCasePacket.NetID = net_id;
 
-	std::string str = this->lobby_->get_nick_name(net_id);
+	std::string str = this->lobby_->GetNickName(net_id);
 	const char* cstr = str.c_str();
 	char* name = const_cast<char*>(cstr);
 
