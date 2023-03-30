@@ -90,52 +90,11 @@ int main(int, char**)
 			ImGui::End();
 		}
 
-
-		//if (show_logger_window)
-		//{
-		//	// log
-		//	ImGui::SetNextWindowPos(ImVec2(30, 350), ImGuiCond_Once);
-		//	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Always);
-		//	ImGui::Begin("logger");
-		//	{
-		//		ImGui::BeginChild("chatText", ImVec2(0, ImGui::GetFontSize() * 10.0f), true);
-
-		//		if (ImGui::BeginMenuBar())
-		//		{
-		//			ImGui::TextUnformatted(u8"Logger");
-		//			ImGui::EndMenuBar();
-		//		}
-
-		//		const int track_item = static_cast<int>(server->log_msg_.size()) - 1;
-		//		for (int item = 0; item < server->log_msg_.size(); item++)
-		//		{
-		//			if (item == track_item)
-		//			{
-		//				ImGui::TextColored(ImVec4(1, 1, 0, 1), server->log_msg_[item].c_str());
-		//				ImGui::SetScrollHereY(1); // 0.0f:top, 0.5f:center, 1.0f:bottom
-		//			}
-		//			else
-		//			{
-		//				ImGui::Text(server->log_msg_[item].c_str());
-		//			}
-		//		}
-
-		//		ImGui::EndChild();
-
-
-		//		ConnectionStatus connection =  server->GetConnectionStatus();
-		//		ImGui::Text(connection_status_str[(static_cast<int>(connection))]);
-
-		//	}
-		//	ImGui::End();
-		//}
-
-
 		if (show_chatting_server)
 		{
 			ImGui::SetNextWindowPos(ImVec2(600, 30), ImGuiCond_Once);
 			ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_Always);
-			ImGui::Begin("Chatting Client");
+			ImGui::Begin("Chatting Server");
 			{
 				if (!isConnect)
 				{

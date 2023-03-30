@@ -36,7 +36,7 @@ int main(int, char**)
 
 	bool is_connect = false;
 	bool checkbox1 = false;
-	static char nickname[128] = "";
+	static char nickname[30] = "";
 	static char password[128] = "";
 	static char msgbox[128] = "";
 	static char check_text[1] = "";
@@ -145,7 +145,7 @@ int main(int, char**)
 			}
 
 			ImGui::SetNextWindowPos(ImVec2(600, 30), ImGuiCond_Once);
-			ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_Always);
+			ImGui::SetNextWindowSize(ImVec2(600, 600), ImGuiCond_Always);
 			ImGui::Begin("Chatting Client");
 			{
 				if (!is_connect)
@@ -169,7 +169,7 @@ int main(int, char**)
 					//ImGui::InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
 					//ImGui::Checkbox(u8"패드워드 확인", &checkbox1);
 					ImGui::SameLine();
-					if (ImGui::Button(u8"체팅방 입장") || (GetAsyncKeyState(VK_RETURN) & 0x8000))
+					if (ImGui::Button(u8"체팅방 입장"))
 					{
 						if (strcmp(nickname, check_text) != 0)
 						{
@@ -234,8 +234,9 @@ int main(int, char**)
 
 					ImGui::InputTextWithHint(" ", "enter msg here", msgbox, IM_ARRAYSIZE(msgbox));
 					ImGui::SameLine();
-					if (ImGui::Button(u8"전송") || (GetAsyncKeyState(VK_RETURN) & 0x8000))
+					if (ImGui::Button(u8"전송"))//|| (GetAsyncKeyState(VK_RETURN) & 0x8000))
 					{
+						// 엔터 키 입력시 연속으로 입력 되는 것을 막아야 한다...
 						if (strcmp(msgbox, check_text) != 0)
 						{
 							client->SendChatMsg(msgbox);

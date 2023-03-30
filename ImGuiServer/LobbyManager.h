@@ -44,7 +44,7 @@ public:
 	~LobbyManager();
 
 public:
-	void Update();												// 업데이트 한다. 타이머를 증가시킨다.
+	void Update();											// 업데이트 한다. 타이머를 증가시킨다.
 	void HeartBeat(NetworkObjectID net_id);					// 새로운 메시지가 올 때마다 
 	void NewPlayer(NetworkObjectID net_id);					// 플레이어 객체를 만든다.
 	void DeletePlayer(NetworkObjectID net_id);
