@@ -790,3 +790,4 @@ sysinfo.txt
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,rider,csharp,c++,c,unity
+ImGuiServer/imgui.ini
