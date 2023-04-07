@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\DxGuiBase\dx11Imgui.h" />
+    <ClInclude Include="..\DxGuiBase\DX11Imgui.h" />
     <ClInclude Include="..\ImGui\imconfig.h" />
     <ClInclude Include="..\ImGui\imgui.h" />
     <ClInclude Include="..\ImGui\imgui_impl_dx11.h" />
@@ -39,7 +39,7 @@
     <ClInclude Include="ServerProgram.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\DxGuiBase\dx11Imgui.cpp" />
+    <ClCompile Include="..\DxGuiBase\DX11Imgui.cpp" />
     <ClCompile Include="..\ImGui\imgui.cpp" />
     <ClCompile Include="..\ImGui\imgui_demo.cpp" />
     <ClCompile Include="..\ImGui\imgui_draw.cpp" />

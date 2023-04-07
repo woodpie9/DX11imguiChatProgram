@@ -1,4 +1,4 @@
-#include "dx11Imgui.h"
+#include "DX11Imgui.h"
 
 
 // 전역 선언, 전방선언
@@ -9,16 +9,16 @@ ID3D11RenderTargetView* mainRenderTargetView = nullptr;
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // Helper functions
-dx11Imgui::dx11Imgui() //:pd3dDevice(nullptr), pd3dDeviceContext(nullptr), pSwapChain(nullptr), mainRenderTargetView(nullptr)
+DX11Imgui::DX11Imgui() //:pd3dDevice(nullptr), pd3dDeviceContext(nullptr), pSwapChain(nullptr), mainRenderTargetView(nullptr)
 {
 }
 
-dx11Imgui::~dx11Imgui()
+DX11Imgui::~DX11Imgui()
 {
 }
 
 
-bool dx11Imgui::init()
+bool DX11Imgui::init()
 {
 	// Create application window
 		//ImGui_ImplWin32_EnableDpiAwareness();
@@ -77,7 +77,7 @@ bool dx11Imgui::init()
 	return true;
 }
 
-bool dx11Imgui::render() const
+bool DX11Imgui::render() const
 {
 	// Rendering
 	ImGui::Render();
@@ -92,7 +92,7 @@ bool dx11Imgui::render() const
 	return true;
 }
 
-bool dx11Imgui::newframe()
+bool DX11Imgui::newframe()
 {
 	// Start the Dear ImGui frame
 	ImGui_ImplDX11_NewFrame();
@@ -102,7 +102,7 @@ bool dx11Imgui::newframe()
 	return true;
 }
 
-bool dx11Imgui::cleanup()
+bool DX11Imgui::cleanup()
 {
 	// Cleanup
 	ImGui_ImplDX11_Shutdown();
@@ -120,7 +120,7 @@ bool dx11Imgui::cleanup()
 
 
 
-bool dx11Imgui::CreateDeviceD3D(HWND hWnd)
+bool DX11Imgui::CreateDeviceD3D(HWND hWnd)
 {
 	// Setup swap chain
 	DXGI_SWAP_CHAIN_DESC sd;
@@ -153,7 +153,7 @@ bool dx11Imgui::CreateDeviceD3D(HWND hWnd)
 	return true;
 }
 
-void dx11Imgui::CleanupDeviceD3D()
+void DX11Imgui::CleanupDeviceD3D()
 {
 	CleanupRenderTarget();
 	if (pSwapChain) { pSwapChain->Release(); pSwapChain = NULL; }
@@ -161,7 +161,7 @@ void dx11Imgui::CleanupDeviceD3D()
 	if (pd3dDevice) { pd3dDevice->Release(); pd3dDevice = NULL; }
 }
 
-void dx11Imgui::CreateRenderTarget()
+void DX11Imgui::CreateRenderTarget()
 {
 	ID3D11Texture2D* pBackBuffer;
 	pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
@@ -169,7 +169,7 @@ void dx11Imgui::CreateRenderTarget()
 	pBackBuffer->Release();
 }
 
-void dx11Imgui::CleanupRenderTarget()
+void DX11Imgui::CleanupRenderTarget()
 {
 	if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
 }
@@ -188,9 +188,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_SIZE:
 			if (pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
 			{
-				dx11Imgui:: CleanupRenderTarget();
+				DX11Imgui:: CleanupRenderTarget();
 				pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-				dx11Imgui::CreateRenderTarget();
+				DX11Imgui::CreateRenderTarget();
 			}
 			return 0;
 		case WM_SYSCOMMAND:

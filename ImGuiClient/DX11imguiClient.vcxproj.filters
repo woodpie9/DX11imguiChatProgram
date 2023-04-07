@@ -15,7 +15,7 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{2a527b5e-efec-4b30-9350-b0cf84530b03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DxGuiBase">
+    <Filter Include="DX11Base">
       <UniqueIdentifier>{bfd40e92-b856-4d8d-b499-8286f0ee857a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -62,8 +62,8 @@
     <ClCompile Include="..\ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\DxGuiBase\dx11Imgui.cpp">
-      <Filter>DxGuiBase</Filter>
+    <ClCompile Include="..\DxGuiBase\DX11Imgui.cpp">
+      <Filter>DX11Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,8 +115,8 @@
     <ClInclude Include="..\ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="..\DxGuiBase\dx11Imgui.h">
-      <Filter>DxGuiBase</Filter>
+    <ClInclude Include="..\DxGuiBase\DX11Imgui.h">
+      <Filter>DX11Base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{d92c0241-43a2-4782-ba30-631158ef3a82}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DxGuiBase">
+    <Filter Include="DX11Base">
       <UniqueIdentifier>{be1f6ff0-6139-4718-bc5a-08934b3d88e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -75,8 +75,8 @@
     <ClInclude Include="LobbyManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\DxGuiBase\dx11Imgui.h">
-      <Filter>DxGuiBase</Filter>
+    <ClInclude Include="..\DxGuiBase\DX11Imgui.h">
+      <Filter>DX11Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,8 +125,8 @@
     <ClCompile Include="LobbyManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\DxGuiBase\dx11Imgui.cpp">
-      <Filter>DxGuiBase</Filter>
+    <ClCompile Include="..\DxGuiBase\DX11Imgui.cpp">
+      <Filter>DX11Base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

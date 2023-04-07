@@ -7,11 +7,11 @@
 #include <tchar.h>
 
 
-class dx11Imgui
+class DX11Imgui
 {
 public:
-	dx11Imgui();
-	~dx11Imgui();
+	DX11Imgui();
+	~DX11Imgui();
 
 	bool init();
 	bool render() const;

@@ -6,11 +6,11 @@
 // Client
 #include "../woodnetBase/WinNetwork.h"
 #include "ClientProgram.h"
-#include "../DxGuiBase/dx11Imgui.h"
+#include "../DxGuiBase/DX11Imgui.h"
 
 woodnet::WinNetwork* network;
 ClientProgram* client;
-dx11Imgui* dx11_gui;
+DX11Imgui* dx11_gui;
 
 
 static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"Connecting",	"Connected",	"OnChat",	"Disconnected",	"Closed" };
@@ -27,7 +27,7 @@ int main(int, char**)
 
 	network = new woodnet::WinNetwork();
 	client = new ClientProgram();
-	dx11_gui = new dx11Imgui();
+	dx11_gui = new DX11Imgui();
 
 	// winsock2 사용 시작
 	network->Init();
