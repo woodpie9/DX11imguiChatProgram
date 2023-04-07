@@ -18,25 +18,25 @@ DX11Imgui::~DX11Imgui()
 }
 
 
-bool DX11Imgui::init()
+bool DX11Imgui::Init()
 {
 	// Create application window
 		//ImGui_ImplWin32_EnableDpiAwareness();
-	wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"ImGui Example", NULL };
-	::RegisterClassExW(&wc);
-	hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, wc.hInstance, NULL);
+	wc_ = { sizeof(wc_), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"ImGui Example", NULL };
+	::RegisterClassExW(&wc_);
+	hwnd_ = ::CreateWindowW(wc_.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, wc_.hInstance, NULL);
 
 	// Initialize Direct3D
-	if (!CreateDeviceD3D(hwnd))
+	if (!CreateDeviceD3D(hwnd_))
 	{
 		CleanupDeviceD3D();
-		::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+		::UnregisterClassW(wc_.lpszClassName, wc_.hInstance);
 		return false;
 	}
 
 	// Show the window
-	::ShowWindow(hwnd, SW_SHOWDEFAULT);
-	::UpdateWindow(hwnd);
+	::ShowWindow(hwnd_, SW_SHOWDEFAULT);
+	::UpdateWindow(hwnd_);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -50,7 +50,7 @@ bool DX11Imgui::init()
 	//ImGui::StyleColorsLight();
 
 	// Setup Platform/Renderer backends
-	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplWin32_Init(hwnd_);
 	ImGui_ImplDX11_Init(pd3dDevice, pd3dDeviceContext);
 
 	// Load Fonts 한글 폰트 추가
@@ -77,11 +77,11 @@ bool DX11Imgui::init()
 	return true;
 }
 
-bool DX11Imgui::render() const
+bool DX11Imgui::Render() const
 {
 	// Rendering
 	ImGui::Render();
-	const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+	const float clear_color_with_alpha[4] = { clear_color_.x * clear_color_.w, clear_color_.y * clear_color_.w, clear_color_.z * clear_color_.w, clear_color_.w };
 	pd3dDeviceContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 	pd3dDeviceContext->ClearRenderTargetView(mainRenderTargetView, clear_color_with_alpha);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -92,7 +92,7 @@ bool DX11Imgui::render() const
 	return true;
 }
 
-bool DX11Imgui::newframe()
+bool DX11Imgui::Newframe()
 {
 	// Start the Dear ImGui frame
 	ImGui_ImplDX11_NewFrame();
@@ -102,7 +102,7 @@ bool DX11Imgui::newframe()
 	return true;
 }
 
-bool DX11Imgui::cleanup()
+bool DX11Imgui::Cleanup()
 {
 	// Cleanup
 	ImGui_ImplDX11_Shutdown();
@@ -110,8 +110,8 @@ bool DX11Imgui::cleanup()
 	ImGui::DestroyContext();
 
 	CleanupDeviceD3D();
-	::DestroyWindow(hwnd);
-	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+	::DestroyWindow(hwnd_);
+	::UnregisterClassW(wc_.lpszClassName, wc_.hInstance);
 
 	return true;
 }

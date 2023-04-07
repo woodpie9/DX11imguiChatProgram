@@ -32,7 +32,7 @@ int main(int, char**)
 	// winsock2 사용 시작
 	network->Init();
 	client->Init();
-	dx11_gui->init();
+	dx11_gui->Init();
 
 	bool is_connect = false;
 	bool checkbox1 = false;
@@ -61,7 +61,7 @@ int main(int, char**)
 
 
 		// 화면을 갱신한다.
-		dx11_gui->newframe();
+		dx11_gui->Newframe();
 
 
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
@@ -93,7 +93,7 @@ int main(int, char**)
 			ImGui::SameLine();
 			ImGui::Text("counter = %d", counter);
 
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / dx11_gui->get_io().Framerate, dx11_gui->get_io().Framerate);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / dx11_gui->GetIo().Framerate, dx11_gui->GetIo().Framerate);
 			ImGui::End();
 		}
 
@@ -259,14 +259,14 @@ int main(int, char**)
 		}
 
 
-		if (!dx11_gui->render())
+		if (!dx11_gui->Render())
 		{
 			return 0;
 		}
 	}
 
 	// dx11, imgui 사용 종료
-	dx11_gui->cleanup();
+	dx11_gui->Cleanup();
 	// winsock2 사용 종료
 	network->CleanUp();
 
