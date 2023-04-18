@@ -20,9 +20,11 @@ static const char* connection_status_str[] = { " None",	"Oppend",	"SetEvent",	"C
 int main(int, char**)
 {
 	// Window State
-	bool show_demo_window = false;
-	bool show_chatting_client = true;
-	bool show_logger_window = true;
+	bool demo_window = false;
+	bool chatting_client_window = true;
+	bool logger_window = true;
+	bool give_choice_quiz_window = true;
+	bool take_choice_quiz_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	network = new woodnet::WinNetwork();
@@ -65,8 +67,8 @@ int main(int, char**)
 
 
 		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
+		if (demo_window)
+			ImGui::ShowDemoWindow(&demo_window);
 
 
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
@@ -81,9 +83,9 @@ int main(int, char**)
 			std::string stdstr = u8"한글한글";
 			ImGui::Text(stdstr.c_str());
 			ImGui::Text("This is some useful text.");					// Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);			// Edit bools storing our window open/close state
-			ImGui::Checkbox(u8"체팅 클라이언트", &show_chatting_client);
-			ImGui::Checkbox("logger window", &show_logger_window);
+			ImGui::Checkbox("Demo Window", &demo_window);			// Edit bools storing our window open/close state
+			ImGui::Checkbox(u8"체팅 클라이언트", &chatting_client_window);
+			ImGui::Checkbox("logger window", &logger_window);
 
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::ColorEdit3("clear color", (float*)&clear_color);	// Edit 3 floats representing a color
@@ -98,7 +100,7 @@ int main(int, char**)
 		}
 
 
-		if (show_logger_window)
+		if (logger_window)
 		{
 			// log
 			ImGui::SetNextWindowPos(ImVec2(30, 350), ImGuiCond_Once);
@@ -136,7 +138,7 @@ int main(int, char**)
 		}
 
 
-		if (show_chatting_client)
+		if (chatting_client_window)
 		{
 			if (is_connect == true)
 			{
@@ -258,6 +260,30 @@ int main(int, char**)
 			ImGui::End();
 		}
 
+		bool multiple_choice_quiz = true;
+		bool Initial_Quiz = false;
+		static int select_quiz = 0;
+
+		if (give_choice_quiz_window)
+		{
+			ImGui::SetNextWindowPos(ImVec2(150, 350), ImGuiCond_Once);
+			ImGui::SetNextWindowSize(ImVec2(400, 350), ImGuiCond_Always);
+			ImGui::Begin("choice_quiz");
+			{
+				ImGui::RadioButton(u8"객관식 퀴즈", &select_quiz, 0); ImGui::SameLine();
+				ImGui::RadioButton(u8"초성 퀴즈", &select_quiz, 1);
+
+				if (select_quiz == 0)
+				{
+					ImGui::TextUnformatted(u8"Logger");
+				}
+				else if (select_quiz == 1)
+				{
+					ImGui::TextUnformatted(u8"L2222ogger");
+				}
+			}
+			ImGui::End();
+		}
 
 		if (!dx11_gui->Render())
 		{
